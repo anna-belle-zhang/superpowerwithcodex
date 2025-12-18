@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(gh auth:*)",
+      "Bash(mkdir -p docs/plans)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh auth status:*)",
+      "Bash(gh repo create superpowerwithcodex --public --description \"Superpowers framework with Codex subagent integration\" --confirm)",
+      "Bash(git init)",
+      "Bash(git config user.name \"anna-belle-zhang\")",
+      "Bash(git remote add origin https://github.com/anna-belle-zhang/superpowerwithcodex.git)",
+      "Bash(git branch -M main)",
+      "Bash(git push -u origin main)",
+      "SlashCommand(/superpowers:write-plan)",
+      "Bash(rm:*)",
+      "Skill(subagent-driven-development)"
+    ]
+  }
+}

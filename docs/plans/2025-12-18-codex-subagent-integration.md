@@ -1199,6 +1199,72 @@ Check:
 - ✅ Skills properly formatted
 - ✅ Git history clean
 
+---
+
+# Implementation Record (2025-12-18)
+
+This section documents what was actually changed in this workspace when implementing this plan.
+
+## Summary
+
+- Added a Codex integration wrapper module (`superpowers-main/lib/codex-integration.js`) with availability checks, retry prompt formatting, and boundary helpers.
+- Added a new workflow skill (`superpowers:codex-subagent-driven-development`) describing the Claude-tests/Codex-implements/review loop.
+- Updated `writing-plans` handoff text to prefer Codex subagents by default when available.
+- Added bash-based tests under the existing OpenCode test harness (this repo does not use Jest/npm test for these checks).
+- Added documentation and a small end-to-end validation plan.
+
+## Files Added / Updated
+
+**Library**
+- Added: `superpowers-main/lib/codex-integration.js`
+
+**Skills**
+- Added: `superpowers-main/skills/codex-subagent-driven-development/SKILL.md`
+- Updated: `superpowers-main/skills/writing-plans/SKILL.md`
+
+**Docs**
+- Added: `superpowers-main/docs/codex-integration.md`
+- Added: `docs/codex-integration.md` (pointer to the nested Superpowers docs)
+- Added: `docs/plans/2025-12-18-test-codex-integration.md`
+- Updated: `superpowers-main/README.md`
+
+**Tests (bash harness)**
+- Added: `superpowers-main/tests/opencode/test-codex-integration.sh`
+- Added: `superpowers-main/tests/opencode/test-codex-mcp.sh` (smoke check; optional integration)
+- Updated: `superpowers-main/tests/opencode/run-tests.sh`
+
+## How To Verify
+
+Run the default (non-integration) suite:
+
+```bash
+bash superpowers-main/tests/opencode/run-tests.sh
+```
+
+Run only the Codex library tests:
+
+```bash
+bash superpowers-main/tests/opencode/run-tests.sh --test test-codex-integration.sh
+```
+
+Optionally run integration tests (requires OpenCode; includes MCP smoke check):
+
+```bash
+bash superpowers-main/tests/opencode/run-tests.sh --integration
+```
+
+## Deviations From The Original Plan
+
+- **Test framework:** The plan described Jest tests run via `npm test`. This repo’s existing test harness is bash-based (`superpowers-main/tests/opencode/`), so tests were implemented as shell scripts using `node -e`.
+- **MCP execution:** `executeWithCodex()` / `spawnCodexAgent()` are currently scaffolds and do not yet perform real MCP protocol calls from Node. Real spawning exists in the Python MCP server (`codex-as-mcp-main/src/codex_as_mcp/server.py`).
+- **Integration test:** The added “MCP test” is a smoke/config check (Codex CLI present + `.mcp.json` shape) rather than a full end-to-end MCP tool invocation.
+
+## Next Steps (If You Want Full End-to-End MCP From Node)
+
+- Decide on a JS MCP client strategy (or invoke `uvx codex-as-mcp@...` directly).
+- Implement `spawnCodexAgent()` to call `codex-subagent.spawn_agent` through MCP and return structured results.
+- Upgrade the smoke test into a true integration test that actually runs the MCP tool and validates file outputs. (This will require a deterministic sandbox directory and cleanup.)
+
 **Step 4: Tag release**
 
 ```bash
