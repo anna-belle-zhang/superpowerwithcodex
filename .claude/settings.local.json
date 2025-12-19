@@ -16,7 +16,22 @@
       "Bash(git push -u origin main)",
       "SlashCommand(/superpowers:write-plan)",
       "Bash(rm:*)",
-      "Skill(subagent-driven-development)"
+      "Skill(subagent-driven-development)",
+      "Bash(node -e:*)",
+      "Bash(bash superpowers-main/tests/opencode/run-tests.sh:*)",
+      "Bash(node tests/utils/math.test.js:*)",
+      "Bash(git reset:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git rev-parse:*)",
+      "Bash(mv:*)",
+      "Bash(mv superpowers-main/.codex .)",
+      "Bash(mv superpowers-main/.github .)",
+      "Bash(mv superpowers-main/.gitignore .)",
+      "Bash(mv superpowers-main/.opencode .)",
+      "Bash(mv superpowers-main/CLAUDE.md .)",
+      "Bash(mv superpowers-main/README.md .)",
+      "Bash(mv superpowers-main/RELEASE-NOTES.md .)"
     ]
   }
 }

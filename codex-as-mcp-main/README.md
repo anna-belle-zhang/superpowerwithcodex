@@ -46,6 +46,19 @@ Add to your `.mcp.json`:
 }
 ```
 
+If you're running from a local checkout (no PyPI / no network needed), you can point MCP at this repo directly:
+```json
+{
+  "mcpServers": {
+    "codex-subagent": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["--directory", "codex-as-mcp-main", "run", "python", "-m", "codex_as_mcp"]
+    }
+  }
+}
+```
+
 Or use Claude Desktop commands:
 ```bash
 claude mcp add codex-subagent -- uvx codex-as-mcp@latest

@@ -1261,9 +1261,8 @@ bash superpowers-main/tests/opencode/run-tests.sh --integration
 
 ## Next Steps (If You Want Full End-to-End MCP From Node)
 
-- Decide on a JS MCP client strategy (or invoke `uvx codex-as-mcp@...` directly).
-- Implement `spawnCodexAgent()` to call `codex-subagent.spawn_agent` through MCP and return structured results.
-- Upgrade the smoke test into a true integration test that actually runs the MCP tool and validates file outputs. (This will require a deterministic sandbox directory and cleanup.)
+- `spawnCodexAgent()` now uses a minimal MCP stdio JSON-RPC client from Node (initialize + `tools/call`).
+- Upgrade the smoke test into a true integration test that actually runs the real MCP server + Codex CLI and validates file outputs. (This will require a deterministic sandbox directory and cleanup.)
 
 **Step 4: Tag release**
 

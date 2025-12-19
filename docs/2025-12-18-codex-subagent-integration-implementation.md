@@ -95,26 +95,22 @@ bash superpowers-main/tests/opencode/run-tests.sh --integration
 
 ## What’s Next
 
-### 1. Implement real MCP invocation from Node
+### 1. Use real MCP invocation with codex-as-mcp
 
-`superpowers-main/lib/codex-integration.js` currently validates configuration and provides retry/boundary helpers, but it does not yet call the MCP tool. To finish the intended “Codex subagent integration” end-to-end:
+`superpowers-main/lib/codex-integration.js` now includes a minimal MCP stdio JSON-RPC client and calls `tools/call` for `spawn_agent`.
 
-- Choose a Node MCP client approach:
-  - Add a lightweight JS MCP client dependency (preferred if this repo already has a dependency mechanism), or
-  - Invoke the MCP server process directly and speak MCP over stdio (more work), or
-  - Use an existing MCP client already present in the host agent runtime (if available).
-- Implement `spawnCodexAgent(prompt, workingDir)` to call:
-  - MCP server: `codex-subagent`
-  - Tool: `spawn_agent`
+To make it work against the real server, ensure `.mcp.json` points at a real `codex-subagent` server (typically `uvx codex-as-mcp@...` or a local path).
 
 ### 2. Upgrade smoke test → true integration test
 
-Once Node can call MCP:
-- Replace/extend `superpowers-main/tests/opencode/test-codex-mcp.sh` to:
-  - start with a temp working directory
-  - call the MCP tool through the Node wrapper
-  - assert that Codex actually created/modified expected files
-  - always clean up temp files
+`superpowers-main/tests/opencode/test-codex-integration.sh` now validates MCP protocol plumbing deterministically using a fake MCP server.
+
+Next step is a true integration test against `codex-as-mcp` + Codex CLI:
+- add a separate test that:
+  - requires a real `.mcp.json` entry + `codex` installed
+  - runs a tiny “create file” prompt in a temp dir
+  - asserts the file exists
+  - cleans up
 
 ### 3. Tighten boundary enforcement
 
@@ -137,4 +133,3 @@ Potential improvements:
 
 - The Node wrapper does not yet perform a real MCP call; the Python server (`codex-as-mcp-main/src/codex_as_mcp/server.py`) is the current working implementation that spawns Codex.
 - Network access is restricted in this environment, so “@latest” installs and online research flows may require explicit approval or a local-path config.
-
