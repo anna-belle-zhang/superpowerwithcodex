@@ -1,0 +1,19 @@
+{
+  "name": "superpowers",
+  "description": "Superpowers with Codex integration - TDD workflows where Claude writes tests and Codex implements code",
+  "version": "4.0.0",
+  "author": {
+    "name": "Anna Belle Zhang",
+    "email": "anna.belle.zhang@example.com"
+  },
+  "homepage": "https://github.com/anna-belle-zhang/superpowerwithcodex",
+  "repository": "https://github.com/anna-belle-zhang/superpowerwithcodex",
+  "license": "MIT",
+  "keywords": ["skills", "tdd", "debugging", "codex", "mcp", "ai-collaboration", "test-driven-development"],
+  "basedOn": {
+    "name": "superpowers",
+    "version": "3.6.2",
+    "author": "Jesse Vincent",
+    "repository": "https://github.com/obra/superpowers"
+  }
+}
