@@ -46,6 +46,8 @@ Run the Superpowers library test that validates the availability check:
 bash superpowers-main/tests/opencode/run-tests.sh --test test-codex-integration.sh
 ```
 
+This test also validates the Node-side MCP stdio protocol plumbing using a fake MCP server (so it’s deterministic and does not require network access).
+
 ## Using Codex Subagents
 
 1. Create a design + plan using the normal flow:
@@ -83,4 +85,3 @@ When tests fail or review issues arise:
 
 **Boundary violations**
 - If Codex touches read-only files, revert those changes and retry with stricter boundary instructions.
-

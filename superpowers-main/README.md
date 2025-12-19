@@ -1,6 +1,24 @@
-# Superpowers
+# Superpowers with Codex Integration
 
-Superpowers is a complete software development workflow for your coding agents, built on top of a set of composable "skills" and some initial instructions that make sure your agent uses them.
+**Fork of [obra/superpowers](https://github.com/obra/superpowers) with Codex MCP integration**
+
+Superpowers is a complete software development workflow for your coding agents, built on top of composable "skills". This fork adds **Codex integration** enabling a powerful TDD workflow where:
+
+- **Claude writes the tests** (enforcing TDD best practices)
+- **Codex implements the code** (via MCP protocol)
+- **Claude reviews and validates** (quality gates with code review)
+
+## 🆕 What's New: Codex Integration
+
+This fork adds the `codex-subagent-driven-development` skill that provides:
+
+- ✅ **Strict TDD Workflow**: RED (Claude tests) → GREEN (Codex implements) → REFACTOR (Claude reviews)
+- ✅ **File Boundary Protection**: Tests and configs are protected from modification
+- ✅ **Retry Chain**: Automatic retry with research guidance on failures
+- ✅ **Quality Gates**: Code review after each implementation task
+- ✅ **Clean Git History**: Separate commits for tests and implementation
+
+See [docs/codex-integration.md](docs/codex-integration.md) for setup and usage.
 
 ## How it works
 
@@ -33,14 +51,16 @@ Thanks!
 In Claude Code, register the marketplace first:
 
 ```bash
-/plugin marketplace add obra/superpowers-marketplace
+/plugin marketplace add anna-belle-zhang/superpowerwithcodex
 ```
 
 Then install the plugin from this marketplace:
 
 ```bash
-/plugin install superpowers@superpowers-marketplace
+/plugin install superpowers@superpowerwithcodex
 ```
+
+**For Codex Integration**: See [docs/codex-integration.md](docs/codex-integration.md) for MCP server setup.
 
 ### Verify Installation
 

@@ -102,7 +102,74 @@ fi
 
 echo ""
 echo "Test 4: executeWithCodex succeeds and reports attempts..."
-result=$(node -e "
+mcp_ok_dir="$TEST_HOME/mcp-ok"
+mkdir -p "$mcp_ok_dir"
+
+cat > "$mcp_ok_dir/fake-mcp-server.py" <<'EOF'
+import json
+import sys
+
+
+def respond(message_id, result):
+    sys.stdout.write(json.dumps({"jsonrpc": "2.0", "id": message_id, "result": result}) + "\n")
+    sys.stdout.flush()
+
+
+def respond_error(message_id, message):
+    sys.stdout.write(
+        json.dumps({"jsonrpc": "2.0", "id": message_id, "error": {"code": -32000, "message": message}}) + "\n"
+    )
+    sys.stdout.flush()
+
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+
+    msg = json.loads(line)
+    method = msg.get("method")
+
+    if method == "initialize":
+        respond(
+            msg.get("id"),
+            {"serverInfo": {"name": "fake-mcp", "version": "0.0.0"}, "capabilities": {"tools": {}}},
+        )
+        continue
+
+    if method == "tools/call":
+        name = (msg.get("params") or {}).get("name")
+        args = ((msg.get("params") or {}).get("arguments") or {})
+        if name != "spawn_agent":
+            respond_error(msg.get("id"), f"unknown tool: {name}")
+            continue
+
+        prompt = str(args.get("prompt") or "")
+        prompt_lower = prompt.lower()
+
+        if "invalid task" in prompt_lower or "will fail" in prompt_lower:
+            respond(msg.get("id"), {"content": [{"type": "text", "text": "Error: Simulated failure"}]})
+            continue
+
+        respond(msg.get("id"), {"content": [{"type": "text", "text": f"OK: {prompt}"}]})
+        continue
+
+    # Ignore notifications like "initialized"
+EOF
+
+cat > "$mcp_ok_dir/.mcp.json" <<EOF
+{
+  "mcpServers": {
+    "codex-subagent": {
+      "type": "stdio",
+      "command": "python3",
+      "args": ["-u", "$mcp_ok_dir/fake-mcp-server.py"]
+    }
+  }
+}
+EOF
+
+result=$(cd "$mcp_ok_dir" && node -e "
 const codex = require('$LIB_PATH');
 (async () => {
   const res = await codex.executeWithCodex({ prompt: 'Create hello.txt', workingDir: process.cwd(), retryCount: 2 });
@@ -131,7 +198,7 @@ fi
 
 echo ""
 echo "Test 5: executeWithCodex respects retryCount on simulated failure..."
-result=$(node -e "
+result=$(cd "$mcp_ok_dir" && node -e "
 const codex = require('$LIB_PATH');
 (async () => {
   const res = await codex.executeWithCodex({ prompt: 'Invalid task that will fail', workingDir: process.cwd(), retryCount: 2 });
@@ -222,4 +289,3 @@ fi
 
 echo ""
 echo "=== All codex integration library tests passed ==="
-
