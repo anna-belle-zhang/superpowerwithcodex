@@ -59,6 +59,7 @@ Then install the plugin from this marketplace:
 ```bash
 /plugin install superpowers@superpowerwithcodex
 ```
+claude plugin install superpowers@superpowerwithcodex --scope project
 
 **For Codex Integration**: See [docs/codex-integration.md](docs/codex-integration.md) for MCP server setup.
 
