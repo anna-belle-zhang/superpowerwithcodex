@@ -8,17 +8,36 @@ Superpowers is a complete software development workflow for your coding agents, 
 - **Codex implements the code** (via MCP protocol)
 - **Claude reviews and validates** (quality gates with code review)
 
-## 🆕 What's New: Codex Integration
+## 🆕 What's New: Three Integration Patterns
 
-This fork adds the `codex-subagent-driven-development` skill that provides:
+This fork adds **three powerful integration patterns** following the thin skill + thick executor architecture:
 
-- ✅ **Strict TDD Workflow**: RED (Claude tests) → GREEN (Codex implements) → REFACTOR (Claude reviews)
+### 1. **Full TDD Workflow** (`codex-subagent-driven-development`)
+- ✅ **Strict TDD**: RED (Claude tests) → GREEN (Codex implements) → REFACTOR (Claude reviews)
 - ✅ **File Boundary Protection**: Tests and configs are protected from modification
 - ✅ **Retry Chain**: Automatic retry with research guidance on failures
 - ✅ **Quality Gates**: Code review after each implementation task
 - ✅ **Clean Git History**: Separate commits for tests and implementation
 
-See [docs/codex-integration.md](docs/codex-integration.md) for setup and usage.
+📖 [Complete Guide](docs/quickstart-codex-subagent-workflow.md)
+
+### 2. **Multimodal Analysis** (`gemini-cli`)
+- ✅ **Analyze Images**: UI/UX feedback, diagram explanation
+- ✅ **Process Documents**: PDF summarization, long-form content
+- ✅ **Audio/Video**: Transcription, content extraction
+- ✅ **Codebase Scanning**: Security audits, architecture analysis
+- ✅ **Context Isolation**: Long output stays in agent, only summaries returned
+
+📖 [Gemini Integration Guide](docs/gemini-cli-integration.md)
+
+### 3. **Quick Coding Tasks** (`codex-cli`)
+- ✅ **One-Off Implementations**: Single functions, quick features
+- ✅ **Bug Fixes**: Targeted fixes with file boundaries
+- ✅ **File Creation**: Generate utilities from descriptions
+- ✅ **Fast Iteration**: No full TDD when you need speed
+- ✅ **Boundary Enforcement**: Strict writable vs read-only control
+
+📖 [Codex CLI Guide](docs/codex-cli-integration.md)
 
 ## How it works
 
@@ -122,6 +141,59 @@ Superpowers can use Codex subagents for implementation in a strict TDD workflow 
 
 **The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
 
+## Quick Usage Examples
+
+### Full TDD Feature Development
+```bash
+# Design first
+User: /superpowers:brainstorm Build a user authentication system
+
+# Plan implementation
+User: /superpowers:write-plan Create the auth system
+
+# Execute with TDD (Claude writes tests, Codex implements, Claude reviews)
+User: Execute with codex-subagent-driven-development
+```
+
+### Quick Coding Tasks
+```bash
+# Implement single function
+User: Use Codex to implement fibonacci in src/utils/math.py
+
+# Fix specific bug
+User: Codex fix the off-by-one error in routes.py:45
+
+# Create utility file
+User: Let Codex create a logger utility with rotation
+```
+
+### Multimodal Analysis
+```bash
+# Analyze image
+User: Use Gemini to analyze screenshot.png for UI issues
+
+# Summarize document
+User: Gemini help me summarize research-paper.pdf
+
+# Scan codebase
+User: Let Gemini scan ./src for security vulnerabilities
+```
+
+### Combined Workflow
+```bash
+# 1. Research with Gemini
+User: Use Gemini to analyze competitor-ui.png
+
+# 2. Design with Claude
+User: /superpowers:brainstorm Design our UI based on insights
+
+# 3. Quick utilities with Codex
+User: Use Codex to create theme.css
+
+# 4. Main feature with full TDD
+User: Execute implementation plan with codex-subagent-driven-development
+```
+
 ## What's Inside
 
 ### Skills Library
@@ -137,7 +209,7 @@ Superpowers can use Codex subagents for implementation in a strict TDD workflow 
 - **verification-before-completion** - Ensure it's actually fixed
 - **defense-in-depth** - Multiple validation layers
 
-**Collaboration** 
+**Collaboration**
 - **brainstorming** - Socratic design refinement
 - **writing-plans** - Detailed implementation plans
 - **executing-plans** - Batch execution with checkpoints
@@ -147,6 +219,11 @@ Superpowers can use Codex subagents for implementation in a strict TDD workflow 
 - **using-git-worktrees** - Parallel development branches
 - **finishing-a-development-branch** - Merge/PR decision workflow
 - **subagent-driven-development** - Fast iteration with quality gates
+
+**External Tool Integration**
+- **codex-subagent-driven-development** - Full TDD workflow with Codex
+- **codex-cli** - One-off Codex tasks (implement, fix, create)
+- **gemini-cli** - Multimodal analysis (images, PDFs, audio, video, codebases)
 
 **Meta** 
 - **writing-skills** - Create new skills following best practices
