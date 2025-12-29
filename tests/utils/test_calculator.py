@@ -1,5 +1,5 @@
 import pytest
-from src.utils.calculator import add, subtract
+from src.utils.calculator import add, subtract, multiply
 
 
 def test_add():
@@ -13,3 +13,10 @@ def test_subtract():
     """Test subtraction of two numbers."""
     assert subtract(5, 3) == 2
     assert subtract(0, 5) == -5
+
+
+def test_multiply():
+    """Test multiplication of two numbers."""
+    assert multiply(4, 5) == 20
+    assert multiply(-2, 3) == -6
+    assert multiply(0, 10) == 0
