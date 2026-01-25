@@ -31,7 +31,17 @@
       "Bash(mv superpowers-main/.opencode .)",
       "Bash(mv superpowers-main/CLAUDE.md .)",
       "Bash(mv superpowers-main/README.md .)",
-      "Bash(mv superpowers-main/RELEASE-NOTES.md .)"
+      "Bash(mv superpowers-main/RELEASE-NOTES.md .)",
+      "WebSearch",
+      "WebFetch(domain:blog.devgenius.io)",
+      "mcp__plugin_claude-mem_mem-search__search",
+      "Bash(/plugin install:*)",
+      "Bash(chmod:*)",
+      "Bash(ls:*)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "codex-subagent"
+  ]
 }
