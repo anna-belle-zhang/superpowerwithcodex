@@ -9,8 +9,9 @@ set -euo pipefail
 # =============================================================================
 
 # Configuration
-REPO_PATH="/mnt/g/A/superpowers-main"
-REPO_NAME="superpowerwithcodex"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_PATH="${SUPERPOWERS_REPO_PATH:-$SCRIPT_DIR}"
+REPO_NAME="$(basename "$REPO_PATH")"
 
 # Colors
 RED='\033[0;31m'

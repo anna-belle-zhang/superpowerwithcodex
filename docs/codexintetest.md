@@ -10,10 +10,10 @@ Codex CLI runs inside a sandboxed Docker container with network blocked by defau
 
 ### Setup (One-Time)
 
-Create or edit `~/.config/codex/config.toml`:
+Create or edit `~/.codex/config.toml`:
 
 ```toml
-[sandbox.workspace_write]
+[sandbox_workspace_write]
 network_access = true
 ```
 
@@ -97,23 +97,60 @@ See: `docs/plans/2026-01-25-ralph-codex-e2e-design.md`
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `network is unreachable` | Network disabled | Add config to `~/.config/codex/config.toml` |
+| `network is unreachable` | Network disabled | Add config to `~/.codex/config.toml` |
 | `docker: command not found` | Docker not installed | Install Docker Desktop or `apt install docker.io` |
 | `permission denied` on docker | Not in docker group | `sudo usermod -aG docker $USER` then re-login |
 | `Cannot connect to Docker daemon` | Daemon not running | `sudo service docker start` |
-| Config file ignored | Wrong path | Must be `~/.config/codex/config.toml` (not `.codex/`) |
-| Azure CLI auth fails | Token not in container | Run `az login` inside Codex or mount credentials |
+| Config file ignored | Wrong path | Must be `~/.codex/config.toml` (not `~/.config/codex/`) |
+| Config section ignored | Wrong TOML syntax | Use `[sandbox_workspace_write]` (underscores, not dots) |
+| `python.exe: Permission denied` | Using Windows az CLI | Install native Linux az: `curl -sL https://aka.ms/InstallAzureCLIDeb \| sudo bash` |
+| `Permission denied: ~/.azure/commands/` | Sandbox can't write logs | Use `export AZURE_CONFIG_DIR=/tmp/azure` workaround |
+| Azure CLI auth fails | Token expired or not copied | Run `az login` in WSL, then copy `~/.azure` to `/tmp/azure` |
 
-### Azure CLI in Codex
+### Install Azure CLI in WSL (Required)
 
-For `az` commands to work, Codex needs Azure credentials. Options:
+The Windows Azure CLI (`/mnt/c/.../az`) does **not** work inside Codex sandbox because:
+- It tries to execute `python.exe` which the Linux sandbox blocks
+- Permission denied errors on Windows binaries
 
-1. **Device code auth** (recommended):
+**Install native Linux Azure CLI:**
+```bash
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+```
+
+**Verify installation:**
+```bash
+which az        # Should show /usr/bin/az
+az --version    # Should show azure-cli 2.x
+```
+
+**Credentials are shared:** The `~/.azure/` directory stores tokens that work for both Windows and Linux CLI versions. If you're already logged in via Windows `az`, no new login is needed.
+
+### Azure CLI in Codex Sandbox
+
+For `az` commands to work inside Codex sandbox, you need credentials and a writable config directory.
+
+**Sandbox workaround** (copy credentials to writable location):
+```bash
+export AZURE_CONFIG_DIR=/tmp/azure
+rm -rf /tmp/azure
+cp -r ~/.azure /tmp/azure
+chmod -R 700 /tmp/azure
+az group list --query "[].name" -o tsv
+```
+
+**Authentication options:**
+
+1. **Use existing WSL credentials** (recommended):
+   - Run `az login` in your normal WSL terminal
+   - Credentials in `~/.azure/` are copied to sandbox via the workaround above
+
+2. **Device code auth** (if no existing login):
    ```bash
    codex e --full-auto "az login --use-device-code"
    ```
 
-2. **Service principal** (CI/CD):
+3. **Service principal** (CI/CD):
    ```bash
    codex e --full-auto "az login --service-principal -u $APP_ID -p $SECRET --tenant $TENANT"
    ```
@@ -124,9 +161,9 @@ For `az` commands to work, Codex needs Azure credentials. Options:
 
 ```bash
 # One-time setup
-mkdir -p ~/.config/codex
-cat > ~/.config/codex/config.toml << 'EOF'
-[sandbox.workspace_write]
+mkdir -p ~/.codex
+cat > ~/.codex/config.toml << 'EOF'
+[sandbox_workspace_write]
 network_access = true
 EOF
 
@@ -135,4 +172,43 @@ codex e --full-auto "curl -s https://api.github.com/zen"
 
 # Run integration tests
 codex e --full-auto "npm run test:integration"
+```
+
+---
+
+## Lessons Learned
+
+Common pitfalls discovered during setup:
+
+### Config File Path
+- **Wrong:** `~/.config/codex/config.toml`
+- **Correct:** `~/.codex/config.toml`
+
+### TOML Section Names
+- **Wrong:** `[sandbox.workspace_write]` (dots)
+- **Correct:** `[sandbox_workspace_write]` (underscores)
+
+### Windows vs Linux CLI in WSL
+| CLI Location | Works in Codex Sandbox? | Reason |
+|--------------|------------------------|--------|
+| `/mnt/c/.../az` (Windows) | No | Sandbox blocks `python.exe` execution |
+| `/usr/bin/az` (Linux) | Yes | Native Linux binary runs normally |
+
+### Azure Credentials
+- `~/.azure/` stores MSAL tokens shared between Windows and Linux CLI
+- `az account show` works offline (reads cached subscription info)
+- `az group list` and other API calls require network + valid tokens
+- Sandbox can't write to `~/.azure/commands/` for logging → use `AZURE_CONFIG_DIR=/tmp/azure`
+
+### MCP Subagent Server
+- Config changes require **Claude Code restart** for MCP server to reload
+- The `codex-as-mcp` server spawns fresh Codex processes that read `~/.codex/config.toml`
+
+### Verification Commands
+```bash
+# Test network in sandbox
+codex e --full-auto "curl -s https://api.github.com/zen"
+
+# Test Azure CLI in sandbox (with workaround)
+codex e --full-auto "export AZURE_CONFIG_DIR=/tmp/azure && cp -r ~/.azure /tmp/azure && az group list -o table | head -5"
 ```
