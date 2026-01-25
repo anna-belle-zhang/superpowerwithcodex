@@ -106,6 +106,16 @@ After saving the plan, offer execution choice. Prefer Codex subagents when avail
 
 **C) Parallel session (separate)** - Open a new session with executing-plans, batch execution with checkpoints
 
+**D) Ralph-Codex-E2E (autonomous)** - Ralph Wiggum loop: Codex handles dev + unit + integration tests, Claude handles E2E, loops until all tests green (walk away and let it run)
+
+**If D (Ralph-Codex-E2E) chosen:**
+- Verify Ralph Wiggum plugin installed (`/plugin install ralph-loop@claude-plugins-official`)
+- Verify Codex network enabled (`~/.config/codex/config.toml` with `network_access = true`)
+- Add plan metadata:
+  - `execution-strategy: ralph-codex-e2e`
+- **REQUIRED SUB-SKILL:** Use `superpowers:ralph-codex-e2e`
+- Construct Ralph loop prompt with plan reference and completion criteria
+
 **If A (Codex) chosen:**
 - If Codex is available:
   - Add plan metadata (recommended):
@@ -130,8 +140,18 @@ If the plan will be executed immediately, include YAML frontmatter at the top of
 
 ```yaml
 ---
-execution-strategy: codex-subagents | claude-subagents
+execution-strategy: codex-subagents | claude-subagents | ralph-codex-e2e
 created: YYYY-MM-DD
 codex-available: true | false
+ralph-available: true | false
 ---
 ```
+
+## Execution Strategy Comparison
+
+| Strategy | Agent Flow | Human Interaction | Best For |
+|----------|------------|-------------------|----------|
+| **codex-subagents** | Claude (tests) → Codex (impl) → Claude (review) | Review between tasks | Supervised TDD |
+| **claude-subagents** | Claude subagent per task | Review between tasks | Fast iteration |
+| **parallel-session** | Separate session with checkpoints | Batch review | Large plans |
+| **ralph-codex-e2e** | Codex (dev+unit+integ) → Claude (E2E) → loop | Walk away | Autonomous execution |
