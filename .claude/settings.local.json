@@ -37,7 +37,11 @@
       "mcp__plugin_claude-mem_mem-search__search",
       "Bash(/plugin install:*)",
       "Bash(chmod:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git config:*)",
+      "Bash(bash:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
