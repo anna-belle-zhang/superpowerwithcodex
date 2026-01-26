@@ -43,7 +43,9 @@
       "Bash(git config:*)",
       "Bash(bash:*)",
       "Bash(node --experimental-vm-modules -e \"\nimport { detectE2EStrategy } from ''./lib/codex-integration.js'';\n\nconsole.log\\(''=== Testing E2E Detection ===''\\);\n\n// Test on current project\nconst strategy = await detectE2EStrategy\\(''/mnt/g/A/superpowers-main''\\);\nconsole.log\\(''Current project E2E strategy:'', JSON.stringify\\(strategy, null, 2\\)\\);\n\")",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(codex e:*)",
+      "Bash(node:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
