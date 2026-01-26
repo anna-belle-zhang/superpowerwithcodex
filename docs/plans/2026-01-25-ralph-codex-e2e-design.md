@@ -53,19 +53,38 @@
 
 ### Step 1: Codex Network Configuration
 
-Create/edit `~/.config/codex/config.toml`:
+Create/edit `~/.codex/config.toml`:
 
 ```toml
-[sandbox.workspace_write]
+[sandbox_workspace_write]
 network_access = true
 ```
 
+**Important:**
+- Path is `~/.codex/` (NOT `~/.config/codex/`)
+- Section uses underscores `[sandbox_workspace_write]` (NOT dots)
+- Restart Claude Code after config changes for MCP to reload
+
 This enables network for all Codex operations (required for integration tests hitting APIs, databases, Azure CLI).
 
-### Step 2: Install Ralph Wiggum Plugin
+### Step 1b: Azure CLI Setup (if using Azure)
+
+For Azure integration tests, install native Linux Azure CLI:
 
 ```bash
-/plugin install ralph-wiggum@claude-plugins-official
+# Install native Linux az (Windows az won't work in sandbox)
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+# Azure credentials workaround (sandbox can't write to ~/.azure)
+export AZURE_CONFIG_DIR=/tmp/azure
+cp -r ~/.azure /tmp/azure
+chmod -R 700 /tmp/azure
+```
+
+### Step 2: Install Ralph Loop Plugin
+
+```bash
+/plugin install ralph-loop@claude-plugins-official
 ```
 
 ### Step 3: Verify MCP Configuration

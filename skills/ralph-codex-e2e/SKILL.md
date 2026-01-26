@@ -30,14 +30,33 @@ Execute a plan using Ralph Wiggum's persistent loop with Codex for implementatio
 
 ### 1. Codex Network Configuration
 
-Codex needs network access for integration tests. Create `~/.config/codex/config.toml`:
+Codex needs network access for integration tests. Create `~/.codex/config.toml`:
 
 ```toml
-[sandbox.workspace_write]
+[sandbox_workspace_write]
 network_access = true
 ```
 
+**Important:**
+- Path: `~/.codex/` (NOT `~/.config/codex/`)
+- Section: `[sandbox_workspace_write]` (underscores, NOT dots)
+- Restart Claude Code after config changes
+
 Verify: `codex e --full-auto "curl -s https://api.github.com/zen"`
+
+### 1b. Azure CLI (if needed)
+
+For Azure integration tests, install native Linux CLI:
+
+```bash
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+```
+
+Azure credentials workaround:
+```bash
+export AZURE_CONFIG_DIR=/tmp/azure
+cp -r ~/.azure /tmp/azure
+```
 
 ### 2. Ralph Wiggum Plugin
 
