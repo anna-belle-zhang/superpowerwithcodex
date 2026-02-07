@@ -35,12 +35,20 @@ Execute a plan by having Claude write tests first (TDD), dispatch Codex for impl
    - Saved under `docs/plans/YYYY-MM-DD-<feature>.md`
    - Tasks are small (2–5 minutes each)
 
+## Execution Mode: Sequential by Default
+
+**Default:** Dispatch one Codex subagent at a time using `spawn_agent`. Complete each task's full TDD cycle (RED → GREEN → review → commit) before starting the next task.
+
+**Parallel only on request:** Only use `spawn_agents_parallel` when the user explicitly asks for parallel execution. Parallel dispatch skips the sequential review-between-tasks gate and risks boundary violations across concurrent tasks.
+
+**Why sequential:** Each task may depend on the previous task's output. Code review catches issues early. The retry chain requires sequential feedback loops. Parallel dispatch should be a conscious opt-in, not a default.
+
 ## The Process
 
 ### 1. Load Plan and Confirm Execution Strategy
 
 - Read the plan file.
-- Confirm the plan’s execution strategy is `codex-subagents` (or ask user to choose).
+- Confirm the plan's execution strategy is `codex-subagents` (or ask user to choose).
 - Check Codex availability using the wrapper (`lib/codex-integration.js`).
 - If unavailable, offer fallback to `superpowers:subagent-driven-development`.
 
@@ -66,8 +74,10 @@ For each task:
   - **Implement in:** code files Codex may modify
   - **Read only:** tests, configs, lockfiles, etc.
 - Build a prompt that includes boundaries and the task steps verbatim.
-- Dispatch Codex via the wrapper:
+- Dispatch **one** Codex subagent via `spawn_agent` (sequential, the default):
   - `executeWithCodex({ prompt, workingDir, retryCount, onProgress })`
+  - **Do NOT use `spawn_agents_parallel`** unless the user explicitly requested parallel execution.
+- Wait for the subagent to complete before proceeding to Step 3c.
 
 #### Step 3c: Verify tests
 
