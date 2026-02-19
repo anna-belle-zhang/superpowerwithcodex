@@ -94,21 +94,23 @@ Construct the Ralph prompt with the plan:
 
 ```bash
 /ralph-loop "Execute plan: docs/plans/YYYY-MM-DD-feature.md
+Specs directory: docs/specs/<feature>/ (if exists, read delta specs for scenarios)
 
 For each task in the plan:
 
 CODEX PHASE:
 1. Read the task requirements
-2. Implement the feature code
-3. Write unit tests for the implementation
-4. Write integration tests (if task requires external calls)
-5. Run unit tests - must pass
-6. Run integration tests - must pass
+2. If specs exist, read the delta specs — each GIVEN/WHEN/THEN scenario is a contractual requirement
+3. Implement the feature code
+4. Write unit tests for the implementation (derive from scenarios when available)
+5. Write integration tests (if task requires external calls)
+6. Run unit tests - must pass
+7. Run integration tests - must pass
 
 CLAUDE PHASE:
-7. Detect project type for E2E strategy
-8. Run E2E tests appropriate to project
-9. Commit if all tests green
+8. Detect project type for E2E strategy
+9. Run E2E tests appropriate to project
+10. Commit if all tests green
 
 COMPLETION:
 - All tasks done with all tests passing = output DONE
@@ -192,11 +194,15 @@ Ralph exits loop when:
 - All E2E tests passing
 - "DONE" output triggered
 
-### 6. Post-Loop Cleanup
+### 6. Post-Loop Verification and Archiving
 
 After Ralph exits:
 - Review git history for all commits
 - Run full test suite one final time
+- **If `docs/specs/<feature>/` exists:**
+  - Use `superpowers:verify-specs` to verify all scenarios are covered
+  - If verification passes: use `superpowers:archive-specs` to merge deltas into living specs
+  - If verification fails: fix missing coverage before proceeding
 - Use `superpowers:finishing-a-development-branch` if needed
 
 ## E2E Detection Logic

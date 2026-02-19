@@ -35,7 +35,18 @@ Cannot proceed with merge/PR until tests pass.
 
 Stop. Don't proceed to Step 2.
 
-**If tests pass:** Continue to Step 2.
+**If tests pass:** Continue to Step 1b.
+
+### Step 1b: Verify Specs (if docs/specs/\<feature\>/ exists)
+
+- Check if `docs/specs/` contains a feature directory for this branch's work.
+- If yes:
+  - **REQUIRED SUB-SKILL:** Use `superpowers:verify-specs`
+  - If verification **fails:** STOP. Fix missing or incorrect coverage before proceeding.
+  - If verification **passes:** Continue to Step 2.
+- If no specs directory exists: Skip to Step 2.
+
+**After merge/PR (Step 4):** If specs were verified, use `superpowers:archive-specs` to merge deltas into living specs and archive the feature directory.
 
 ### Step 2: Determine Base Branch
 

@@ -41,8 +41,12 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Tech Stack:** [Key technologies/libraries]
 
+**Specs:** [Path to docs/specs/<feature>/ if structured specs exist, otherwise omit]
+
 ---
 ```
+
+**When structured specs exist** (`docs/specs/<feature>/`), read the delta specs and incorporate scenarios into each task (see Task Structure below).
 
 ## Task Structure
 
@@ -54,12 +58,24 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
 
+**Scenarios (from delta spec):** *(include when specs-dir exists)*
+| ID | Scenario | Source |
+|----|----------|--------|
+| S1 | GIVEN x WHEN y THEN z | specs/<component>-delta.md |
+| S2 | GIVEN a WHEN b THEN c | specs/<component>-delta.md |
+
 **Step 1: Write the failing test**
+
+*When scenarios exist, derive the test directly from the GIVEN/WHEN/THEN scenario:*
+- GIVEN → test setup / preconditions
+- WHEN → action under test
+- THEN → assertion
 
 ```python
 def test_specific_behavior():
-    result = function(input)
-    assert result == expected
+    # GIVEN x (from S1)
+    result = function(input)  # WHEN y
+    assert result == expected  # THEN z
 ```
 
 **Step 2: Run test to verify it fails**
@@ -144,6 +160,7 @@ execution-strategy: codex-subagents | claude-subagents | ralph-codex-e2e
 created: YYYY-MM-DD
 codex-available: true | false
 ralph-available: true | false
+specs-dir: docs/specs/<feature>/  # optional, include when structured specs exist
 ---
 ```
 

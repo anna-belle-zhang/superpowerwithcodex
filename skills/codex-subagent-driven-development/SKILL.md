@@ -63,6 +63,7 @@ For each task:
 #### Step 3a: RED (Claude writes failing tests)
 
 - Read the task carefully.
+- **If the plan references `specs-dir`:** read the delta specs and derive tests from GIVEN/WHEN/THEN scenarios. Each scenario's GIVEN → setup, WHEN → action, THEN → assertion.
 - Write the failing test(s) exactly as specified.
 - Run the test(s) to confirm failure.
 - Commit tests only:
@@ -72,8 +73,9 @@ For each task:
 
 - Define explicit file boundaries:
   - **Implement in:** code files Codex may modify
-  - **Read only:** tests, configs, lockfiles, etc.
+  - **Read only:** tests, configs, lockfiles, `docs/specs/`, etc.
 - Build a prompt that includes boundaries and the task steps verbatim.
+- **If specs exist:** include a "Specification Contract" section in the Codex prompt listing all GIVEN/WHEN/THEN scenarios from the task's delta spec as inviolable requirements that the implementation must satisfy.
 - Dispatch **one** Codex subagent via `spawn_agent` (sequential, the default):
   - `executeWithCodex({ prompt, workingDir, retryCount, onProgress })`
   - **Do NOT use `spawn_agents_parallel`** unless the user explicitly requested parallel execution.
@@ -99,6 +101,7 @@ For each task:
   - `HEAD_SHA` = current HEAD
 - Verify file boundaries:
   - If Codex modified any read-only files, revert those changes and retry.
+- **If specs exist:** verify all GIVEN/WHEN/THEN scenarios from the task's delta spec are covered by tests. An uncovered scenario is a Critical review issue.
 - Dispatch a code-reviewer subagent:
   - Use the template at `skills/requesting-code-review/code-reviewer.md`
 

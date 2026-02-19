@@ -39,6 +39,11 @@ Start by understanding the current project context, then ask questions one at a 
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
 
+**Structured Specifications (recommended):**
+- Ask: "Would you like structured specs with testable scenarios?"
+- If yes: Use `superpowers:write-specs` to create proposal + delta specs with GIVEN/WHEN/THEN scenarios
+- If no: Keep design doc in `docs/plans/` (legacy format) and proceed to implementation
+
 **Implementation (if continuing):**
 - Ask: "Ready to set up for implementation?"
 - Use superpowers:using-git-worktrees to create isolated workspace

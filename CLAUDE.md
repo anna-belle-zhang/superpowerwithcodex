@@ -47,6 +47,9 @@ skills/
 - `/superpowers:brainstorm` - Interactive design refinement
 - `/superpowers:write-plan` - Create implementation plan
 - `/superpowers:execute-plan` - Execute plan in batches
+- `/superpowers:write-specs` - Create structured specifications with testable scenarios
+- `/superpowers:verify-specs` - Verify all spec scenarios have corresponding tests
+- `/superpowers:archive-specs` - Archive delta specs into living specifications
 
 ### Directory Structure
 
@@ -64,17 +67,23 @@ skills/
 
 1. **brainstorming** - Before writing code, refine ideas through questions, explore alternatives, present design in sections. Saves to `docs/plans/YYYY-MM-DD-<topic>-design.md`
 
-2. **using-git-worktrees** - After design approval, create isolated workspace on new branch, verify clean test baseline
+2. **writing-specs** *(optional)* - Transform brainstorm output into structured specs with GIVEN/WHEN/THEN scenarios. Creates `docs/specs/<feature>/` with proposal, design, and delta specs
 
-3. **writing-plans** - Break work into 2-5 minute tasks with exact file paths, complete code, verification steps
+3. **using-git-worktrees** - After design approval, create isolated workspace on new branch, verify clean test baseline
 
-4. **subagent-driven-development** or **executing-plans** - Dispatch fresh subagent per task or execute in batches with checkpoints
+4. **writing-plans** - Break work into 2-5 minute tasks with exact file paths, complete code, verification steps. When specs exist, tasks include scenario tables
 
-5. **test-driven-development** - Enforces RED-GREEN-REFACTOR cycle. Write failing test, watch it fail, write minimal code, watch it pass
+5. **subagent-driven-development** or **executing-plans** - Dispatch fresh subagent per task or execute in batches with checkpoints. When specs exist, scenarios become inviolable contracts
 
-6. **requesting-code-review** - Review against plan between tasks, block progress on critical issues
+6. **test-driven-development** - Enforces RED-GREEN-REFACTOR cycle. Write failing test, watch it fail, write minimal code, watch it pass
 
-7. **finishing-a-development-branch** - Verify tests, present merge/PR options, cleanup
+7. **requesting-code-review** - Review against plan between tasks, block progress on critical issues
+
+8. **verifying-specs** *(when specs exist)* - Verify completeness, correctness, and coherence of specs against implementation
+
+9. **finishing-a-development-branch** - Verify tests (and specs if they exist), present merge/PR options, cleanup
+
+10. **archiving-specs** *(when specs exist)* - Merge delta specs into living specs, archive feature directory
 
 **CRITICAL: These workflows are mandatory, not suggestions. Skills are enforced processes.**
 
@@ -126,6 +135,58 @@ skills/
 - Skipping watch-it-fail step → You don't know if test works
 
 **See:** `skills/test-driven-development/SKILL.md`
+
+## Structured Specifications
+
+### Overview
+
+Structured specs provide testable contracts between design and implementation. They are **optional** — the brainstorming skill offers them after design completion.
+
+### Directory Convention
+
+```
+docs/specs/
+  <feature>/                    # Per-feature working directory
+    proposal.md                 # Intent, scope, impact, success criteria
+    design.md                   # Technical decisions
+    specs/
+      <component>-delta.md      # Delta spec with GIVEN/WHEN/THEN scenarios
+  _living/                      # Merged source of truth (post-archiving)
+    <component>.md              # Current system behavior
+  _archive/                     # Completed features
+    YYYY-MM-DD-<feature>/       # Archived feature specs
+```
+
+### Delta Spec Format
+
+```markdown
+## ADDED
+### <Behavior Name>
+GIVEN [precondition] WHEN [action] THEN [result]
+
+## MODIFIED
+### <Behavior Name>
+Was: [old] → Now: [new] → Reason: [why]
+GIVEN ... WHEN ... THEN ...
+
+## REMOVED
+### <Behavior Name>
+Was: [what] → Reason: [why]
+```
+
+### Workflow
+
+1. **Write specs** (`/superpowers:write-specs`) — after brainstorming, create structured specs
+2. **Plan with scenarios** — writing-plans includes scenario tables when specs exist
+3. **Execute with contracts** — Codex receives scenarios as inviolable requirements
+4. **Verify specs** (`/superpowers:verify-specs`) — check completeness, correctness, coherence
+5. **Archive specs** (`/superpowers:archive-specs`) — merge deltas into living specs, archive feature
+
+### Key Files
+
+- `skills/writing-specs/SKILL.md` - Spec authoring process
+- `skills/verifying-specs/SKILL.md` - Three-check verification
+- `skills/archiving-specs/SKILL.md` - Delta-to-living merge process
 
 ## Installation & Updates
 
@@ -183,6 +244,9 @@ skills/
 - `skills/writing-skills/SKILL.md` - Complete skill authoring guide
 - `skills/test-driven-development/SKILL.md` - TDD methodology and enforcement
 - `skills/brainstorming/SKILL.md` - Design refinement process
+- `skills/writing-specs/SKILL.md` - Structured specification authoring
+- `skills/verifying-specs/SKILL.md` - Spec verification (completeness, correctness, coherence)
+- `skills/archiving-specs/SKILL.md` - Delta-to-living spec merge process
 - `agents/code-reviewer.md` - Code review agent definition
 
 ## Philosophy Reminders
