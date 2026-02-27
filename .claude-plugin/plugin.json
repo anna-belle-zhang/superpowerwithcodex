@@ -1,5 +1,5 @@
 {
-  "name": "superpowers",
+  "name": "superpowerwithcodex",
   "description": "Superpowers with Codex integration - TDD workflows where Claude writes tests and Codex implements code",
   "version": "4.0.0",
   "author": {

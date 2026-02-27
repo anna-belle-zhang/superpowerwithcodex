@@ -8,7 +8,7 @@
   "homepage": "https://github.com/anna-belle-zhang/superpowerwithcodex",
   "plugins": [
     {
-      "name": "superpowers",
+      "name": "superpowerwithcodex",
       "description": "Superpowers with Codex integration - Claude writes tests, Codex implements code",
       "version": "4.0.0",
       "source": "./",
