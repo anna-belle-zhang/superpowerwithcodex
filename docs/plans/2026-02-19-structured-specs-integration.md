@@ -570,22 +570,29 @@ Test that the finishing skill gates on spec verification.
 
 The definitive test — run the entire enhanced workflow on a small feature.
 
-**Steps:**
+> **Completed: 2026-02-28** — Feature: `skill-marketplace-search`
 
-1. `/superpowers:brainstorm` — design a small feature (e.g., "add a string reverse utility")
-2. Answer "yes" to structured specs → verify `docs/specs/<feature>/` is created
-3. Set up worktree → `/superpowers:write-plan` → verify plan has scenario tables
-4. Execute with Codex or Claude subagents → verify specs are treated as contracts
-5. `/superpowers:verify-specs` → verify all scenarios covered (PASS)
-6. `/superpowers:archive-specs` → verify deltas merged to `_living/`, feature archived
-7. `/superpowers:finishing-a-development-branch` → verify clean completion
+**Steps run:**
 
-**Expected final state:**
-- Feature implemented with all tests passing
-- `docs/specs/_living/` contains the merged living spec
-- `docs/specs/_archive/YYYY-MM-DD-<feature>/` contains the original specs
-- No `docs/specs/<feature>/` remaining (moved to archive)
-- Clean git history with spec commits
+1. ✅ `/superpowerwithcodex:brainstorm` — designed "skill marketplace search" feature (slash command that fetches remote catalog JSON, filters by query against name+description, displays detailed cards)
+2. ✅ Answered "yes" to structured specs → created `docs/specs/skill-marketplace-search/` with `proposal.md`, `design.md`, and 2 delta specs (7 GIVEN/WHEN/THEN scenarios total)
+3. ✅ Global worktree at `~/.config/superpowers/worktrees/superpowerwithcodex/feature/skill-marketplace-search` (user chose global over project-local)
+4. ✅ `/superpowerwithcodex:writing-plans` → plan had scenario tables for all 7 delta spec scenarios, saved to `docs/plans/2026-02-28-skill-marketplace-search.md`
+5. ✅ Executed with Codex subagents (strategy A) — `commands/search.md` and `skills/search-marketplace/SKILL.md` created. Baseline pressure test (RED) documented in `tests/skills/search-marketplace-baseline.md`
+6. ⚠️ `/superpowerwithcodex:verifying-specs` → **6/7 scenarios covered** — S1 (Search Command Registration) had no subagent pressure test. Correctness 6/6, Coherence PASS. S7 loophole (announce-before-query-check) found and fixed during REFACTOR phase.
+7. ↩️ archive-specs and finishing-a-development-branch skipped — branch merged directly to main
+
+**Actual final state:**
+- `commands/search.md` and `skills/search-marketplace/SKILL.md` merged to `main`
+- `docs/specs/skill-marketplace-search/` remains (not archived — archive-specs was skipped)
+- `tests/skills/search-marketplace-baseline.md` and `tests/skills/search-marketplace-green.md` document pressure test results
+- 6/7 delta spec scenarios verified passing; S1 (command registration) remains untested
+
+**Lessons learned:**
+- Skill-based features (no production code) require pressure tests not unit tests — the "test" for command registration is a subagent scenario, not a file check
+- Baseline pressure test showed Claude naturally does ~80% of the right thing for happy path; skill needed to enforce exact card format and error messages
+- S7 loophole (announce with empty query) only surfaced during GREEN phase testing, not during writing — confirms pressure testing value
+- Global worktree preferred by user over project-local `.worktrees/`
 
 ---
 
