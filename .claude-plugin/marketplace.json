@@ -1,5 +1,7 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "superpowerwithcodex",
+  "version": "4.0.0",
   "description": "Superpowers with Codex MCP integration - TDD workflows with AI collaboration",
   "owner": {
     "name": "Anna Belle Zhang",
