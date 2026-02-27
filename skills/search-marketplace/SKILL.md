@@ -7,8 +7,6 @@ description: Use when user runs /superpowerwithcodex:search to find skills in a 
 
 Search a remote marketplace catalog for skills matching a query.
 
-**Announce at start:** "Searching marketplace for '<query>'..."
-
 ## Usage
 
 `/superpowerwithcodex:search <query> --source <catalog-url>`
@@ -26,6 +24,8 @@ If `<query>` is empty after trimming, print:
 Usage: /superpowerwithcodex:search <query> --source <catalog-url>
 ```
 Stop. Do not proceed.
+
+**Announce:** "Searching marketplace for '<query>'..." (only after confirming query is non-empty)
 
 ### Step 2: Fetch Catalog
 
