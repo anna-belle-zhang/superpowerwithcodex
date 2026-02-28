@@ -76,7 +76,7 @@ In Claude Code, register the marketplace first:
 Then install the plugin from this marketplace:
 
 ```bash
-/plugin install superpowers@superpowerwithcodex
+/plugin install superpowerwithcodex@superpowerwithcodex
 ```
 
 **For Codex Integration**: See [docs/codex-integration.md](docs/codex-integration.md) for MCP server setup.
@@ -91,9 +91,13 @@ Check that commands appear:
 
 ```
 # Should see:
-# /superpowers:brainstorm - Interactive design refinement
-# /superpowers:write-plan - Create implementation plan
-# /superpowers:execute-plan - Execute plan in batches
+# /superpowerwithcodex:brainstorm   - Interactive design refinement
+# /superpowerwithcodex:write-plan   - Create implementation plan
+# /superpowerwithcodex:execute-plan - Execute plan in batches
+# /superpowerwithcodex:write-specs  - Create structured specifications
+# /superpowerwithcodex:verify-specs - Verify spec scenarios have tests
+# /superpowerwithcodex:archive-specs - Archive delta specs into living specs
+# /superpowerwithcodex:search       - Search marketplace catalog
 ```
 
 ### Codex
@@ -121,7 +125,57 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 Superpowers can use Codex subagents for implementation in a strict TDD workflow where Claude writes tests and reviews.
 
 - Setup and workflow: [docs/codex-integration.md](docs/codex-integration.md)
-- Skill: `superpowers:codex-subagent-driven-development`
+- Skill: `superpowerwithcodex:codex-subagent-driven-development`
+
+## End-to-End Full Chain (with Structured Specs)
+
+The complete workflow for a new feature using structured specifications:
+
+```
+brainstorm → write-specs → worktree → write-plan → execute → verify-specs → archive-specs → finish
+```
+
+**Step-by-step:**
+
+1. **Design** — `/superpowerwithcodex:brainstorm <your idea>`
+   - Refines idea through questions, presents design in sections for approval
+   - Saves design to `docs/plans/YYYY-MM-DD-<feature>-design.md`
+
+2. **Structured specs** (opt-in) — `/superpowerwithcodex:write-specs`
+   - Creates `docs/specs/<feature>/proposal.md`, `design.md`, and `specs/<component>-delta.md`
+   - Each delta spec has GIVEN/WHEN/THEN scenarios — testable contracts
+
+3. **Isolated workspace** — `/superpowerwithcodex:using-git-worktrees`
+   - Creates a git worktree on a new feature branch
+   - Verifies clean test baseline before work starts
+
+4. **Implementation plan** — `/superpowerwithcodex:write-plan`
+   - Breaks work into 2-5 minute tasks with exact file paths and code
+   - When specs exist, each task includes a scenario table from delta specs
+
+5. **Execute** — choose a strategy:
+   - **A) Codex subagents** (recommended): Claude writes tests → Codex implements → Claude reviews
+   - **B) Claude subagents**: Fresh subagent per task with review between tasks
+   - **C) Parallel session**: Separate session with batch execution and checkpoints
+   - **D) Ralph-Codex-E2E**: Fully autonomous loop (walk away)
+
+6. **Verify specs** — `/superpowerwithcodex:verify-specs`
+   - Completeness: every GIVEN/WHEN/THEN scenario has a passing test
+   - Correctness: each test's setup/action/assertion matches its scenario
+   - Coherence: no contradictions between delta specs or living specs
+   - Blocks merge on failure — no exceptions
+
+7. **Finish branch** — `/superpowerwithcodex:finishing-a-development-branch`
+   - Presents merge / PR / keep / discard options
+   - Automatically runs archive-specs after merge
+
+8. **Archive specs** — `/superpowerwithcodex:archive-specs`
+   - Merges delta specs into `docs/specs/_living/` (source of truth)
+   - Moves feature dir to `docs/specs/_archive/YYYY-MM-DD-<feature>/`
+
+**Structured specs are opt-in.** The brainstorming skill asks after design approval. If you skip specs, steps 2, 6, and 8 are omitted and the workflow is: brainstorm → worktree → write-plan → execute → finish.
+
+---
 
 ## The Basic Workflow
 
@@ -146,10 +200,10 @@ Superpowers can use Codex subagents for implementation in a strict TDD workflow 
 ### Full TDD Feature Development
 ```bash
 # Design first
-User: /superpowers:brainstorm Build a user authentication system
+User: /superpowerwithcodex:brainstorm Build a user authentication system
 
 # Plan implementation
-User: /superpowers:write-plan Create the auth system
+User: /superpowerwithcodex:write-plan Create the auth system
 
 # Execute with TDD (Claude writes tests, Codex implements, Claude reviews)
 User: Execute with codex-subagent-driven-development
@@ -185,7 +239,7 @@ User: Let Gemini scan ./src for security vulnerabilities
 User: Use Gemini to analyze competitor-ui.png
 
 # 2. Design with Claude
-User: /superpowers:brainstorm Design our UI based on insights
+User: /superpowerwithcodex:brainstorm Design our UI based on insights
 
 # 3. Quick utilities with Codex
 User: Use Codex to create theme.css
@@ -224,6 +278,7 @@ User: Execute implementation plan with codex-subagent-driven-development
 - **codex-subagent-driven-development** - Full TDD workflow with Codex
 - **codex-cli** - One-off Codex tasks (implement, fix, create)
 - **gemini-cli** - Multimodal analysis (images, PDFs, audio, video, codebases)
+- **search-marketplace** - Search remote marketplace catalog before installing
 
 **Meta** 
 - **writing-skills** - Create new skills following best practices
@@ -256,7 +311,7 @@ See `skills/writing-skills/SKILL.md` for the complete guide.
 Skills update automatically when you update the plugin:
 
 ```bash
-/plugin update superpowers
+/plugin update superpowerwithcodex
 ```
 
 ## License

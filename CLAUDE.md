@@ -44,12 +44,13 @@ skills/
 - `hooks/hooks.json` - Session start hooks
 
 **Commands:**
-- `/superpowers:brainstorm` - Interactive design refinement
-- `/superpowers:write-plan` - Create implementation plan
-- `/superpowers:execute-plan` - Execute plan in batches
-- `/superpowers:write-specs` - Create structured specifications with testable scenarios
-- `/superpowers:verify-specs` - Verify all spec scenarios have corresponding tests
-- `/superpowers:archive-specs` - Archive delta specs into living specifications
+- `/superpowerwithcodex:brainstorm` - Interactive design refinement
+- `/superpowerwithcodex:write-plan` - Create implementation plan
+- `/superpowerwithcodex:execute-plan` - Execute plan in batches
+- `/superpowerwithcodex:write-specs` - Create structured specifications with testable scenarios
+- `/superpowerwithcodex:verify-specs` - Verify all spec scenarios have corresponding tests
+- `/superpowerwithcodex:archive-specs` - Archive delta specs into living specifications
+- `/superpowerwithcodex:search` - Search remote marketplace catalog for skills by keyword
 
 ### Directory Structure
 
@@ -176,11 +177,11 @@ Was: [what] → Reason: [why]
 
 ### Workflow
 
-1. **Write specs** (`/superpowers:write-specs`) — after brainstorming, create structured specs
+1. **Write specs** (`/superpowerwithcodex:write-specs`) — after brainstorming, create structured specs
 2. **Plan with scenarios** — writing-plans includes scenario tables when specs exist
 3. **Execute with contracts** — Codex receives scenarios as inviolable requirements
-4. **Verify specs** (`/superpowers:verify-specs`) — check completeness, correctness, coherence
-5. **Archive specs** (`/superpowers:archive-specs`) — merge deltas into living specs, archive feature
+4. **Verify specs** (`/superpowerwithcodex:verify-specs`) — check completeness, correctness, coherence
+5. **Archive specs** (`/superpowerwithcodex:archive-specs`) — merge deltas into living specs, archive feature
 
 ### Key Files
 
@@ -192,22 +193,26 @@ Was: [what] → Reason: [why]
 
 **Install via Claude Code Plugin Marketplace:**
 ```bash
-/plugin marketplace add obra/superpowers-marketplace
-/plugin install superpowers@superpowers-marketplace
+/plugin marketplace add anna-belle-zhang/superpowerwithcodex
+/plugin install superpowerwithcodex@superpowerwithcodex
 ```
 
 **Update:**
 ```bash
-/plugin update superpowers
+/plugin update superpowerwithcodex
 ```
 
 **Verify installation:**
 ```bash
 /help
 # Should show:
-# /superpowers:brainstorm - Interactive design refinement
-# /superpowers:write-plan - Create implementation plan
-# /superpowers:execute-plan - Execute plan in batches
+# /superpowerwithcodex:brainstorm - Interactive design refinement
+# /superpowerwithcodex:write-plan - Create implementation plan
+# /superpowerwithcodex:execute-plan - Execute plan in batches
+# /superpowerwithcodex:write-specs - Create structured specifications
+# /superpowerwithcodex:verify-specs - Verify spec scenarios have tests
+# /superpowerwithcodex:archive-specs - Archive delta specs into living specs
+# /superpowerwithcodex:search - Search marketplace catalog
 ```
 
 ## Multi-Platform Support
