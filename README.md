@@ -2,17 +2,42 @@
 
 **Fork of [obra/superpowers](https://github.com/obra/superpowers) with Codex MCP integration**
 
-Superpowers is a complete software development workflow for your coding agents, built on top of composable "skills". This fork adds **Codex integration** enabling a powerful TDD workflow where:
+Superpowers is a complete software development workflow for your coding agents, built on top of composable "skills". This fork adds **Codex integration** enabling two powerful TDD workflows:
 
+**Specs-first workflow** (recommended):
+- **Claude writes specs** (GIVEN/WHEN/THEN contracts) and runs E2E tests
+- **Codex reads specs, writes its own plan + unit + integration tests, implements**
+
+**Tests-first workflow** (when you need human review between tasks):
 - **Claude writes the tests** (enforcing TDD best practices)
 - **Codex implements the code** (via MCP protocol)
 - **Claude reviews and validates** (quality gates with code review)
 
-## 🆕 What's New: Three Integration Patterns
+## 🆕 What's New: Four Integration Patterns
 
 This fork adds **three powerful integration patterns** following the thin skill + thick executor architecture:
 
-### 1. **Full TDD Workflow** (`codex-subagent-driven-development`)
+### 1. **Specs-First Workflow** (`claude-codex-specs-tdd` + `spec-driven-tdd`)
+
+The recommended workflow. Claude writes specs; Codex does everything else.
+
+- ✅ **Claude writes specs**: GIVEN/WHEN/THEN scenarios as contractual requirements
+- ✅ **Codex reads specs**: derives its own plan, unit tests, and integration tests
+- ✅ **Single dispatch**: Claude sends spec path — Codex runs autonomously
+- ✅ **Progress tracking**: Codex saves `progress.md` in the spec folder
+- ✅ **E2E by Claude**: Claude runs end-to-end tests after Codex returns
+- ✅ **Mid-cycle re-entry**: re-enter at any point to fix issues or update specs
+
+**Claude Code skill**: `superpowerwithcodex:claude-codex-specs-tdd`
+**Codex skill** (loaded by Codex automatically): `superpowerwithcodex:spec-driven-tdd`
+
+**Full workflow:**
+```
+brainstorm → write-specs → dispatch Codex → Codex: reads specs, writes plan,
+             TDD loop, updates progress.md → Claude: E2E tests → verify-specs
+```
+
+### 2. **Tests-First TDD Workflow** (`codex-subagent-driven-development`)
 - ✅ **Strict TDD**: RED (Claude tests) → GREEN (Codex implements) → REFACTOR (Claude reviews)
 - ✅ **File Boundary Protection**: Tests and configs are protected from modification
 - ✅ **Retry Chain**: Automatic retry with research guidance on failures
@@ -21,7 +46,7 @@ This fork adds **three powerful integration patterns** following the thin skill 
 
 📖 [Complete Guide](docs/quickstart-codex-subagent-workflow.md)
 
-### 2. **Multimodal Analysis** (`gemini-cli`)
+### 3. **Multimodal Analysis** (`gemini-cli`)
 - ✅ **Analyze Images**: UI/UX feedback, diagram explanation
 - ✅ **Process Documents**: PDF summarization, long-form content
 - ✅ **Audio/Video**: Transcription, content extraction
@@ -30,7 +55,7 @@ This fork adds **three powerful integration patterns** following the thin skill 
 
 📖 [Gemini Integration Guide](docs/gemini-cli-integration.md)
 
-### 3. **Quick Coding Tasks** (`codex-cli`)
+### 4. **Quick Coding Tasks** (`codex-cli`)
 - ✅ **One-Off Implementations**: Single functions, quick features
 - ✅ **Bug Fixes**: Targeted fixes with file boundaries
 - ✅ **File Creation**: Generate utilities from descriptions
@@ -105,8 +130,10 @@ Check that commands appear:
 Tell Codex:
 
 ```
-Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.codex/INSTALL.md
+Fetch and follow instructions from https://raw.githubusercontent.com/anna-belle-zhang/superpowerwithcodex/refs/heads/main/.codex/INSTALL.md
 ```
+
+This installs skills to `~/.codex/superpowerwithcodex/` and bootstraps via `.codex/superpowerwithcodex-bootstrap.md`. Codex will automatically discover and load `superpowerwithcodex:spec-driven-tdd` when dispatched by Claude.
 
 **Detailed docs:** [docs/README.codex.md](docs/README.codex.md)
 
@@ -154,10 +181,11 @@ brainstorm → write-specs → worktree → write-plan → execute → verify-sp
    - When specs exist, each task includes a scenario table from delta specs
 
 5. **Execute** — choose a strategy:
-   - **A) Codex subagents** (recommended): Claude writes tests → Codex implements → Claude reviews
-   - **B) Claude subagents**: Fresh subagent per task with review between tasks
-   - **C) Parallel session**: Separate session with batch execution and checkpoints
-   - **D) Ralph-Codex-E2E**: Fully autonomous loop (walk away)
+   - **A) Specs-first** (recommended): Claude writes specs → Codex reads specs, plans, tests, implements → Claude runs E2E
+   - **B) Tests-first**: Claude writes tests → Codex implements → Claude reviews
+   - **C) Claude subagents**: Fresh subagent per task with review between tasks
+   - **D) Parallel session**: Separate session with batch execution and checkpoints
+   - **E) Ralph-Codex-E2E**: Fully autonomous loop (walk away)
 
 6. **Verify specs** — `/superpowerwithcodex:verify-specs`
    - Completeness: every GIVEN/WHEN/THEN scenario has a passing test
@@ -197,7 +225,21 @@ brainstorm → write-specs → worktree → write-plan → execute → verify-sp
 
 ## Quick Usage Examples
 
-### Full TDD Feature Development
+### Specs-First Feature Development (Recommended)
+```bash
+# 1. Design
+User: /superpowerwithcodex:brainstorm Build a user authentication system
+
+# 2. Write specs (GIVEN/WHEN/THEN)
+User: /superpowerwithcodex:write-specs
+
+# 3. Claude dispatches Codex — Codex reads specs, writes plan + tests, implements
+User: /superpowerwithcodex:claude-codex-specs-tdd
+# → Codex loads spec-driven-tdd, reads docs/specs/auth/, writes progress.md
+# → Claude runs E2E tests, validates spec coverage
+```
+
+### Tests-First Feature Development
 ```bash
 # Design first
 User: /superpowerwithcodex:brainstorm Build a user authentication system
@@ -275,7 +317,9 @@ User: Execute implementation plan with codex-subagent-driven-development
 - **subagent-driven-development** - Fast iteration with quality gates
 
 **External Tool Integration**
-- **codex-subagent-driven-development** - Full TDD workflow with Codex
+- **claude-codex-specs-tdd** - Claude writes specs, dispatches Codex, runs E2E (recommended)
+- **spec-driven-tdd** *(Codex skill)* - Codex reads specs, writes plan, TDD loop, saves progress.md
+- **codex-subagent-driven-development** - Claude writes tests, Codex implements, Claude reviews
 - **codex-cli** - One-off Codex tasks (implement, fix, create)
 - **gemini-cli** - Multimodal analysis (images, PDFs, audio, video, codebases)
 - **search-marketplace** - Search remote marketplace catalog before installing
