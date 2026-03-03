@@ -11,6 +11,18 @@ Claude is architect and validator. Codex is planner and implementer. Specs are t
 
 **Violating the letter of these rules is violating the spirit.**
 
+## The Full Workflow
+
+```
+1. Brainstorm   → use superpowerwithcodex:brainstorming
+2. Write specs  → use superpowerwithcodex:write-specs → docs/specs/<feature>/
+3. Dispatch     → send spec path to Codex (format below)
+4. Codex runs   → loads spec-driven-tdd, reads specs, writes plan,
+                   TDD loop, updates progress.md
+5. E2E tests    → Claude runs E2E after Codex returns
+6. Validate     → use superpowerwithcodex:verify-specs
+```
+
 ## When to Use
 
 - Implementing features with Codex via MCP
