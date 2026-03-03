@@ -1,44 +1,77 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
+## Superpowerwithcodex System
 
-This repository is a small “meta workspace” containing two primary projects:
+<EXTREMELY_IMPORTANT>
+You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex bootstrap` and follow the instructions it returns.
+</EXTREMELY_IMPORTANT>
 
-- `superpowers-main/`: the Superpowers skills + plugin content
-  - `skills/<skill-name>/SKILL.md`: individual skills (directory name is kebab-case; frontmatter `name:` should match)
-  - `lib/`, `commands/`, `agents/`, `hooks/`: supporting runtime content and templates
-  - `tests/opencode/`: shell-based test suite for the OpenCode plugin integration
-- `codex-as-mcp-main/`: a Python MCP server that spawns Codex subagents
-  - `src/codex_as_mcp/`: Python package source (src layout)
-  - `pyproject.toml`: packaging metadata
-  - `test.sh`: helper for running MCP Inspector against the local server
-- `docs/plans/`: design notes and project planning documents
+## Project Structure
+
+```
+skills/                   # All skill definitions (flat namespace)
+  <skill-name>/
+    SKILL.md              # YAML frontmatter (name, description) + content
+commands/                 # Slash command definitions
+agents/                   # Agent definitions (e.g. code-reviewer)
+lib/                      # Core utilities (skills-core.js)
+hooks/                    # Lifecycle hooks
+docs/
+  plans/                  # Design notes (YYYY-MM-DD-<topic>-design.md)
+  specs/                  # Structured specs (GIVEN/WHEN/THEN)
+    <feature>/
+      specs/*-delta.md    # Delta specs written by Claude
+      progress.md         # Written by Codex during implementation
+    _living/              # Merged living specs (post-archiving)
+    _archive/             # Completed feature specs
+tests/
+  e2e/                    # End-to-end test projects
+  skills/                 # Skill baseline scenario documents
+  opencode/               # OpenCode integration tests
+codex-as-mcp-main/        # Python MCP server that spawns Codex subagents
+  src/codex_as_mcp/       # Python package source
+  pyproject.toml
+```
+
+## Key Workflows
+
+**Specs-first (recommended):**
+```
+brainstorm → write-specs → claude-codex-specs-tdd dispatch →
+  Codex: spec-driven-tdd (reads specs, writes plan, TDD, updates progress.md) →
+Claude: E2E tests → verify-specs
+```
+
+**Tests-first:**
+```
+brainstorm → write-plan → codex-subagent-driven-development
+  (Claude writes tests, Codex implements, Claude reviews)
+```
 
 ## Build, Test, and Development Commands
 
-- Superpowers (OpenCode tests): `bash superpowers-main/tests/opencode/run-tests.sh`
-  - Run integration tests: `bash superpowers-main/tests/opencode/run-tests.sh --integration`
-  - Run one test: `bash superpowers-main/tests/opencode/run-tests.sh --test test-skills-core.sh`
-- codex-as-mcp (local dev): from `codex-as-mcp-main/`, run `./test.sh` (starts MCP Inspector + local server via `uv`)
-- codex-as-mcp (build package): from `codex-as-mcp-main/`, run `uv build`
+- OpenCode tests: `bash tests/opencode/run-tests.sh`
+  - Integration: `bash tests/opencode/run-tests.sh --integration`
+  - Single test: `bash tests/opencode/run-tests.sh --test test-skills-core.sh`
+- E2E suite: `bash tests/e2e/ralph-codex-e2e/run-tests.sh`
+- codex-as-mcp (local dev): from `codex-as-mcp-main/`, run `./test.sh`
+- codex-as-mcp (build): from `codex-as-mcp-main/`, run `uv build`
 
 ## Coding Style & Naming Conventions
 
-- Markdown: keep headings descriptive; prefer short, scannable sections and bullets.
-- Skills: use kebab-case directories (e.g. `root-cause-tracing/`) and keep the YAML frontmatter accurate (`name`, `description`).
-- Shell scripts: use `#!/usr/bin/env bash` and `set -euo pipefail`; keep scripts runnable via `bash path/to/script.sh`.
-- Python (codex-as-mcp): 4-space indentation; keep new modules under `codex-as-mcp-main/src/codex_as_mcp/`.
+- Skills: kebab-case directories (e.g. `root-cause-tracing/`); YAML frontmatter `name` must match directory name; `description` starts with "Use when..."
+- Markdown: short, scannable sections and bullets
+- Shell scripts: `#!/usr/bin/env bash` and `set -euo pipefail`
+- Python (codex-as-mcp): 4-space indentation; new modules under `codex-as-mcp-main/src/codex_as_mcp/`
 
 ## Testing Guidelines
 
-- OpenCode tests are bash scripts named `test-*.sh` in `superpowers-main/tests/opencode/`; ensure new tests are deterministic and clean up temp files.
-- For codex-as-mcp, prefer exercising behavior via `codex-as-mcp-main/test.sh` and MCP Inspector when changing server behavior.
+- New skills MUST follow RED-GREEN-REFACTOR: run baseline WITHOUT skill, write skill, re-test WITH skill
+- OpenCode tests: bash scripts named `test-*.sh` in `tests/opencode/`; deterministic, clean up temp files
+- Skill baseline scenarios: document in `tests/skills/<skill-name>-baseline.md`
 
-## Commit & Pull Request Guidelines
+## Commit Guidelines
 
-- Commit messages: this repo currently uses a prefix style (example: `Design: ...`). Prefer `<Area>: <imperative summary>` (e.g. `Docs: Update install steps`).
-- PRs: clearly state which subproject you changed (`superpowers-main/` vs `codex-as-mcp-main/`), include the exact commands run (and their output if relevant), and update the nearest README/SKILL docs when behavior changes.
-
-## Security & Configuration Tips
-
-- Don’t commit secrets or local config (tokens, `.mcp.json`, etc.). Use environment variables for credentials (for example, PyPI publishing in `codex-as-mcp-main/` expects `PYPI_USERNAME`/`PYPI_TOKEN`).
+- Prefix style: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`
+- Keep commits focused: one logical change per commit
+- Don't commit secrets or local config (`.mcp.json`, tokens, etc.)
