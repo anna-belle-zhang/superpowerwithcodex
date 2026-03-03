@@ -46,7 +46,20 @@
       "Bash(git stash:*)",
       "Bash(codex e:*)",
       "Bash(node:*)",
-      "Bash(python -m pytest:*)"
+      "Bash(python -m pytest:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(claude:*)",
+      "Bash(codex:*)",
+      "WebFetch(domain:example.com)",
+      "mcp__plugin_superpowerwithcodex_codex-subagent__spawn_agent",
+      "Bash(git merge:*)",
+      "Bash(git:*)",
+      "WebFetch(domain:developers.openai.com)",
+      "Skill(ralph-loop:ralph-loop)",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__codex-subagent__spawn_agent"
     ]
   },
   "enableAllProjectMcpServers": true,

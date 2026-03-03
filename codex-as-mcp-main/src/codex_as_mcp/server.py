@@ -89,7 +89,8 @@ async def spawn_agent(ctx: Context, prompt: str) -> str:
             "--cd",
             work_directory,
             "--skip-git-repo-check",
-            "--full-auto",
+            "--ask-for-approval", "never",
+            "--sandbox", "workspace-write",
             "--output-last-message",
             str(output_path),
             quoted_prompt,
@@ -104,6 +105,7 @@ async def spawn_agent(ctx: Context, prompt: str) -> str:
         try:
             proc = await asyncio.create_subprocess_exec(
                 *cmd,
+                stdin=asyncio.subprocess.DEVNULL,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -113,9 +115,13 @@ async def spawn_agent(ctx: Context, prompt: str) -> str:
         stdout_task = asyncio.create_task(proc.stdout.read()) if proc.stdout else None
         stderr_task = asyncio.create_task(proc.stderr.read()) if proc.stderr else None
 
-        # Send periodic heartbeats while process runs
+        # Send periodic heartbeats while process runs, enforcing overall timeout
         last_ping = time.monotonic()
+        start_time = time.monotonic()
         while True:
+            if time.monotonic() - start_time > DEFAULT_TIMEOUT_SECONDS:
+                proc.kill()
+                return f"Error: Codex agent timed out after {DEFAULT_TIMEOUT_SECONDS}s"
             try:
                 returncode = await asyncio.wait_for(proc.wait(), timeout=2.0)
                 break
