@@ -127,14 +127,13 @@ Check that commands appear:
 
 ### Codex
 
-Tell Codex to run these steps directly:
+This is a private repo — install via symlink from your local checkout (skills update instantly, no sync needed):
 
-**Step 1 — Clone this repo into Codex's skills directory:**
+**Step 1 — Symlink local repo into Codex's skills directory:**
 ```bash
-mkdir -p ~/.codex/superpowerwithcodex
-cd ~/.codex/superpowerwithcodex
-git clone https://github.com/anna-belle-zhang/superpowerwithcodex.git .
+ln -s /path/to/your/superpowerwithcodex ~/.codex/superpowerwithcodex
 ```
+Replace `/path/to/your/superpowerwithcodex` with the actual path where you cloned this repo.
 
 **Step 2 — Create personal skills directory:**
 ```bash

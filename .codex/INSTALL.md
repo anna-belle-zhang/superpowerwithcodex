@@ -1,22 +1,21 @@
 # Installing Superpowerwithcodex for Codex
 
-Quick setup to enable superpowerwithcodex skills in Codex.
+This is a private repo. Install via symlink from your local checkout — skills update instantly without any sync step.
 
 ## Installation
 
-1. **Clone superpowerwithcodex repository**:
+1. **Symlink local repo into Codex's skills directory**:
    ```bash
-   mkdir -p ~/.codex/superpowerwithcodex
-   cd ~/.codex/superpowerwithcodex
-   git clone https://github.com/anna-belle-zhang/superpowerwithcodex.git .
+   ln -s /path/to/your/superpowerwithcodex ~/.codex/superpowerwithcodex
    ```
+   Replace `/path/to/your/superpowerwithcodex` with the actual path where this repo lives on your machine.
 
 2. **Create personal skills directory**:
    ```bash
    mkdir -p ~/.codex/skills
    ```
 
-3. **Update ~/.codex/AGENTS.md** to include this section:
+3. **Add to `~/.codex/AGENTS.md`**:
    ```markdown
    ## Superpowerwithcodex System
 
@@ -27,7 +26,6 @@ Quick setup to enable superpowerwithcodex skills in Codex.
 
 ## Verification
 
-Test the installation:
 ```bash
 ~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex bootstrap
 ```
