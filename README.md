@@ -127,13 +127,35 @@ Check that commands appear:
 
 ### Codex
 
-Tell Codex:
+Tell Codex to run these steps directly:
 
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/anna-belle-zhang/superpowerwithcodex/refs/heads/main/.codex/INSTALL.md
+**Step 1 — Clone this repo into Codex's skills directory:**
+```bash
+mkdir -p ~/.codex/superpowerwithcodex
+cd ~/.codex/superpowerwithcodex
+git clone https://github.com/anna-belle-zhang/superpowerwithcodex.git .
 ```
 
-This installs skills to `~/.codex/superpowerwithcodex/` and bootstraps via `.codex/superpowerwithcodex-bootstrap.md`. Codex will automatically discover and load `superpowerwithcodex:spec-driven-tdd` when dispatched by Claude.
+**Step 2 — Create personal skills directory:**
+```bash
+mkdir -p ~/.codex/skills
+```
+
+**Step 3 — Add to `~/.codex/AGENTS.md`:**
+```markdown
+## Superpowerwithcodex System
+
+<EXTREMELY_IMPORTANT>
+You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex bootstrap` and follow the instructions it returns.
+</EXTREMELY_IMPORTANT>
+```
+
+**Step 4 — Verify:**
+```bash
+~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex bootstrap
+```
+
+You should see skill listings. Codex will now automatically discover and load `superpowerwithcodex:spec-driven-tdd` when dispatched by Claude via `claude-codex-specs-tdd`.
 
 **Detailed docs:** [docs/README.codex.md](docs/README.codex.md)
 
