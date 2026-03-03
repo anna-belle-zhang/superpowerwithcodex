@@ -1,6 +1,6 @@
 ---
 name: spec-driven-tdd
-description: Use when dispatched by Claude with a spec directory path - read specs first (specs have specifics intuition misses), write plan, TDD loop per task (unit tests from GIVEN/WHEN/THEN → implement → integration tests), save progress.md. Re-entry: check progress.md, resume from incomplete tasks.
+description: "Use when dispatched by Claude with a spec directory path - read specs first (specs have specifics intuition misses), write plan, TDD loop per task (unit tests from GIVEN/WHEN/THEN, implement, integration tests), save progress.md. Re-entry: check progress.md, resume from incomplete tasks."
 ---
 
 # Spec-Driven TDD
