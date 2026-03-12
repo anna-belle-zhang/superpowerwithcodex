@@ -86,32 +86,8 @@ fi
 # =============================================================================
 print_header "Step 3: Repository Information"
 
-cat <<EOF
-
-Repository: $REPO_NAME
-Path: $REPO_PATH
-Remote: $REMOTE_URL
-
-Key Components:
----------------
-${CYAN}Skills System:${NC}
-  - skills/                    # Skill definitions (TDD, brainstorming, etc.)
-  - lib/skills-core.js         # Core skill discovery logic
-
-${CYAN}Plugin System:${NC}
-  - .claude-plugin/plugin.json      # Plugin metadata
-  - .claude-plugin/marketplace.json # Marketplace configuration
-
-${CYAN}Codex Integration:${NC}
-  - codex-as-mcp-main/         # Codex MCP server for subagents
-  - docs/codex-integration.md  # Integration documentation
-
-${CYAN}Commands:${NC}
-  - /superpowers:brainstorm    # Interactive design refinement
-  - /superpowers:write-plan    # Create implementation plan
-  - /superpowers:execute-plan  # Execute plan in batches
-
-EOF
+print_info "Repository: $REPO_NAME"
+print_info "Remote: $REMOTE_URL"
 
 # =============================================================================
 # Step 4: Stage Changes
@@ -122,9 +98,8 @@ if [ -n "$(git status --porcelain)" ]; then
     print_info "Adding all changes..."
     git add -A
 
-    echo ""
-    echo "Staged files:"
-    git diff --cached --stat
+    STAGED_COUNT=$(git diff --cached --name-only | wc -l)
+    print_success "Staged $STAGED_COUNT files"
 else
     print_info "No changes to stage"
 fi
@@ -159,10 +134,8 @@ if ! git diff --cached --quiet; then
 
     print_info "Creating commit: $MSG"
     git commit -m "$MSG"
-    print_success "Commit created successfully"
-
-    echo ""
-    git --no-pager log -1 --stat
+    COMMIT_SHA=$(git rev-parse --short HEAD)
+    print_success "Commit created: $COMMIT_SHA"
 else
     print_info "No staged changes to commit"
 fi

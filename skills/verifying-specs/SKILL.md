@@ -1,11 +1,11 @@
 ---
 name: verifying-specs
-description: Use when implementation is complete and you need to verify all GIVEN/WHEN/THEN scenarios have corresponding tests - checks completeness, correctness, and coherence of specs against implementation
+description: Use when implementation is complete and you need to verify all GIVEN/WHEN/THEN scenarios have corresponding tests, then identify any newly exposed technical debt before merge
 ---
 
 # Verifying Specifications
 
-Verify that implementation fully satisfies structured specifications before merge.
+Verify that implementation fully satisfies structured specifications before merge, then capture any technical debt surfaced by the change.
 
 **Core principle:** Every GIVEN/WHEN/THEN scenario must have a passing test. No exceptions.
 
@@ -13,10 +13,14 @@ Verify that implementation fully satisfies structured specifications before merg
 
 ## Overview
 
-Three verification checks:
+Three blocking verification checks:
 1. **Completeness** — every scenario has a corresponding test
 2. **Correctness** — each test's setup/action/assertion matches its scenario
 3. **Coherence** — no contradictions between deltas or against living specs
+
+Technical debt follow-up:
+4. **Debt identification** — collect `// DEBT:` annotations and behaviors replaced by REMOVED deltas
+5. **Debt tracking** — write `technical-debt.md`, update `_technical-debt.md`, and offer cleanup
 
 ## The Process
 
@@ -93,6 +97,91 @@ Check for contradictions:
 **Coherence: PASS/FAIL**
 ```
 
+### Step 4a: Collect Manual Debt Annotations
+
+Scan the codebase for `// DEBT:` comments after verification passes:
+
+```bash
+rg -n "// DEBT:" src tests . 2>/dev/null
+```
+
+Collect each result with:
+- file path
+- line number
+- reason text after `// DEBT:`
+
+If no manual annotations exist, continue. This alone is not a failure.
+
+### Step 4b: Scenario-Driven Debt Identification
+
+When delta specs contain `## REMOVED`, compare them against `docs/specs/_living/`:
+
+1. Read the REMOVED behaviors in each delta
+2. Search `_living/` for matching behavior headings or scenario text
+3. Treat matching living behaviors as technical debt that should be removed from code, docs, or old pathways
+
+If `docs/specs/_living/` does not exist:
+- Log a warning
+- Continue gracefully (feature may not modify existing behavior)
+
+If there are no `REMOVED` sections and no `// DEBT:` comments:
+- Skip Step 4c through Step 4e
+- Report that Step 4 was skipped because no technical debt was found
+- Continue to `superpowers:archiving-specs`
+
+### Step 4c: Write Feature-Level `technical-debt.md`
+
+When debt items are identified, write `docs/specs/<feature>/technical-debt.md` with:
+
+```markdown
+# Technical Debt
+
+## Build Commands
+**Build command:** <build command>
+**Test command:** <test command>
+
+## Technical Debt
+
+### DEBT-N: <short label>
+**What:** <files or obsolete behavior to remove>
+**Why:** <reason this is debt>
+**Replaced by:** <new implementation or scenario>
+**Verification:** <how to verify removal>
+**Source:** <manual annotation or living/delta reference>
+```
+
+Required structure:
+- Build Commands section
+- List of DEBT-N entries
+- `What, Why, Replaced by, Verification, Source`
+- `What`, `Why`, `Replaced by`, `Verification`, and `Source` fields for each entry
+
+If build/test commands are not already obvious from the repo, prompt the user once and record the answers.
+
+### Step 4d: Update Project-Level Debt Tracker
+
+Create or update `docs/specs/_technical-debt.md` with one row per debt item:
+
+- Unique `DEBT-N` IDs
+- Feature name
+- File paths or behavior references
+- Priority field
+- Status set to `Pending`
+
+This tracker is the cross-feature ledger used later by `cleanup-and-refactor`.
+
+### Step 4e: Prompt for Cleanup
+
+If debt items were found, report the count and prompt:
+
+```text
+Found N debt items. Run cleanup-and-refactor now? (yes/no)
+```
+
+- If yes: invoke `superpowers:cleanup-and-refactor`
+- If no: continue to `superpowers:archiving-specs` with debt tracked for later
+- If no: continue to `archive-specs` after verification
+
 ### Step 5: Final Verdict
 
 ```markdown
@@ -111,12 +200,24 @@ Check for contradictions:
 
 **If PASS:** "All specifications verified. Safe to proceed with merge/finish."
 
+If Step 4 created debt items, append a short debt summary:
+
+```markdown
+## Technical Debt Summary
+
+- Manual debt annotations found: N
+- Scenario-driven debt items found: M
+- Tracker updated: docs/specs/_technical-debt.md
+- Feature debt file: docs/specs/<feature>/technical-debt.md
+```
+
 ## Blocking Rules
 
 - **Any MISSING scenario** → FAIL (must write test first)
 - **Any INCORRECT test** → FAIL (must fix test or update spec)
 - **Any contradiction** → FAIL (must resolve before proceeding)
-- **All checks pass** → PASS (proceed to archiving)
+- **Debt found** → track it, but do not fail verification solely for tracked debt
+- **All checks pass** → PASS (proceed to cleanup prompt or archiving)
 
 ## Key Principles
 
@@ -124,7 +225,8 @@ Check for contradictions:
 - **Match by behavior, not name** — test naming conventions vary
 - **Read the actual test code** — don't just check for test existence
 - **Report specifics** — "MISSING" alone isn't helpful; say which scenario and what's needed
-- **Block on failure** — verification gates the merge, no exceptions
+- **Track debt explicitly** — technical debt should become visible work, not tribal knowledge
+- **Block on verification failure** — verification gates the merge, no exceptions
 
 ## Integration
 
@@ -136,5 +238,11 @@ Check for contradictions:
 - Delta specs in `docs/specs/<feature>/specs/`
 - Implemented and passing tests
 
+**Produces:**
+- Verification summary
+- `docs/specs/<feature>/technical-debt.md` when debt is found
+- `docs/specs/_technical-debt.md` when debt is found
+
 **Followed by:**
-- `superpowers:archiving-specs` — after verification passes
+- `superpowers:cleanup-and-refactor` — when the user chooses yes at Step 4e
+- `superpowers:archiving-specs` — after verification passes when cleanup is skipped or complete

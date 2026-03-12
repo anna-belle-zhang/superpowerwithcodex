@@ -121,6 +121,7 @@ Check that commands appear:
 # /superpowerwithcodex:execute-plan - Execute plan in batches
 # /superpowerwithcodex:write-specs  - Create structured specifications
 # /superpowerwithcodex:verify-specs - Verify spec scenarios have tests
+# /superpowerwithcodex:cleanup-and-refactor - Clean tracked technical debt in an isolated worktree
 # /superpowerwithcodex:archive-specs - Archive delta specs into living specs
 # /superpowerwithcodex:search       - Search marketplace catalog
 ```
@@ -180,7 +181,7 @@ Superpowers can use Codex subagents for implementation in a strict TDD workflow 
 The complete workflow for a new feature using structured specifications:
 
 ```
-brainstorm → write-specs → worktree → write-plan → execute → verify-specs → archive-specs → finish
+brainstorm → write-specs → worktree → write-plan → execute → verify-specs → cleanup-and-refactor? → archive-specs → finish
 ```
 
 **Step-by-step:**
@@ -212,13 +213,19 @@ brainstorm → write-specs → worktree → write-plan → execute → verify-sp
    - Completeness: every GIVEN/WHEN/THEN scenario has a passing test
    - Correctness: each test's setup/action/assertion matches its scenario
    - Coherence: no contradictions between delta specs or living specs
+   - Collects `// DEBT:` annotations and REMOVED/living-spec debt into `technical-debt.md`
    - Blocks merge on failure — no exceptions
 
-7. **Finish branch** — `/superpowerwithcodex:finishing-a-development-branch`
+7. **Technical debt cleanup** (when debt is found) — `/superpowerwithcodex:cleanup-and-refactor`
+   - Creates an isolated `cleanup/<feature>` worktree
+   - Dispatches Codex with `code-simplification`
+   - Runs build + test verification before presenting merge options
+
+8. **Finish branch** — `/superpowerwithcodex:finishing-a-development-branch`
    - Presents merge / PR / keep / discard options
    - Automatically runs archive-specs after merge
 
-8. **Archive specs** — `/superpowerwithcodex:archive-specs`
+9. **Archive specs** — `/superpowerwithcodex:archive-specs`
    - Merges delta specs into `docs/specs/_living/` (source of truth)
    - Moves feature dir to `docs/specs/_archive/YYYY-MM-DD-<feature>/`
 

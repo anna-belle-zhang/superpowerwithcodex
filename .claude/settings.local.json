@@ -59,7 +59,12 @@
       "Bash(npm install:*)",
       "Bash(npm test:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "mcp__codex-subagent__spawn_agent"
+      "mcp__codex-subagent__spawn_agent",
+      "Bash(powershell:*)",
+      "Bash(cd ~/.config/superpowers/worktrees/superpowerwithcodex/feature/technical-debt-cleanup && pytest tests/structured-specs-integration/ -v)",
+      "Bash(grep -l \"## REMOVED\" docs/specs/technical-debt-cleanup/specs/*-delta.md 2>/dev/null || echo \"No REMOVED sections in delta specs\")",
+      "Bash(cd ~/.config/superpowers/worktrees/superpowerwithcodex/feature/technical-debt-cleanup && pytest tests/structured-specs-integration/ -q)",
+      "Bash(pytest tests/structured-specs-integration/ -q)"
     ]
   },
   "enableAllProjectMcpServers": true,
