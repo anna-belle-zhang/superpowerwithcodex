@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+don't ask permission for low risk actions
+
 ## Project Overview
 
 Superpowers is a complete software development workflow system for coding agents, built on composable "skills" that enforce systematic processes. It transforms how agents approach development by requiring design before code, comprehensive planning before implementation, and test-driven development throughout.

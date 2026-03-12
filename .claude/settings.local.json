@@ -64,7 +64,11 @@
       "Bash(cd ~/.config/superpowers/worktrees/superpowerwithcodex/feature/technical-debt-cleanup && pytest tests/structured-specs-integration/ -v)",
       "Bash(grep -l \"## REMOVED\" docs/specs/technical-debt-cleanup/specs/*-delta.md 2>/dev/null || echo \"No REMOVED sections in delta specs\")",
       "Bash(cd ~/.config/superpowers/worktrees/superpowerwithcodex/feature/technical-debt-cleanup && pytest tests/structured-specs-integration/ -q)",
-      "Bash(pytest tests/structured-specs-integration/ -q)"
+      "Bash(pytest tests/structured-specs-integration/ -q)",
+      "Bash(find tests:*)",
+      "Read(//root/.config/superpowers/worktrees/superpowerwithcodex/cleanup-skill-marketplace-search/**)",
+      "Bash(rm -rf skills/search-marketplace commands/search.md tests/skills/search-marketplace-*.md)",
+      "Bash(cd ~/.config/superpowers/worktrees/superpowerwithcodex/cleanup-skill-marketplace-search && pytest tests/ -q)"
     ]
   },
   "enableAllProjectMcpServers": true,
