@@ -121,9 +121,8 @@ Check that commands appear:
 # /superpowerwithcodex:execute-plan - Execute plan in batches
 # /superpowerwithcodex:write-specs  - Create structured specifications
 # /superpowerwithcodex:verify-specs - Verify spec scenarios have tests
-# /superpowerwithcodex:cleanup-and-refactor - Clean tracked technical debt in an isolated worktree
 # /superpowerwithcodex:archive-specs - Archive delta specs into living specs
-# /superpowerwithcodex:search       - Search marketplace catalog
+# /superpowerwithcodex:cleanup-and-refactor - Clean tracked technical debt in isolated worktree
 ```
 
 ### Codex
@@ -210,16 +209,23 @@ brainstorm → write-specs → worktree → write-plan → execute → verify-sp
    - **E) Ralph-Codex-E2E**: Fully autonomous loop (walk away)
 
 6. **Verify specs** — `/superpowerwithcodex:verify-specs`
-   - Completeness: every GIVEN/WHEN/THEN scenario has a passing test
-   - Correctness: each test's setup/action/assertion matches its scenario
-   - Coherence: no contradictions between delta specs or living specs
-   - Collects `// DEBT:` annotations and REMOVED/living-spec debt into `technical-debt.md`
-   - Blocks merge on failure — no exceptions
+   - **Completeness:** every GIVEN/WHEN/THEN scenario has a passing test
+   - **Correctness:** each test's setup/action/assertion matches its scenario
+   - **Coherence:** no contradictions between delta specs or living specs
+   - **Technical Debt:** collects `// DEBT:` annotations + scenario-driven debt (REMOVED behaviors)
+   - Creates `technical-debt.md` + updates `_technical-debt.md` tracker
+   - Prompts: "Run cleanup-and-refactor now? (yes/no)"
+   - Blocks merge on verification failure — no exceptions
 
-7. **Technical debt cleanup** (when debt is found) — `/superpowerwithcodex:cleanup-and-refactor`
-   - Creates an isolated `cleanup/<feature>` worktree
-   - Dispatches Codex with `code-simplification`
-   - Runs build + test verification before presenting merge options
+7. **Technical debt cleanup** (optional) — `/superpowerwithcodex:cleanup-and-refactor <feature>`
+   - **Isolated worktree:** Creates `cleanup/<feature>` branch for safe removal
+   - **Codex execution:** Dispatches Codex with `code-simplification` skill
+     - Phase 1: Remove debt items (files, obsolete code)
+     - Phase 2: Static analysis (feature-scoped, finds unused code)
+     - Phase 3: Refactoring (extract duplicates → reduce complexity → apply patterns)
+   - **Automated verification:** Build + test before merge
+   - **Merge options:** Auto-merge | Create PR | Manual review | Abort
+   - **Status tracking:** Updates `_technical-debt.md` (Pending → In Progress → Completed/Failed)
 
 8. **Finish branch** — `/superpowerwithcodex:finishing-a-development-branch`
    - Presents merge / PR / keep / discard options
@@ -335,6 +341,9 @@ User: Execute implementation plan with codex-subagent-driven-development
 
 **Collaboration**
 - **brainstorming** - Socratic design refinement
+- **writing-specs** - Structured GIVEN/WHEN/THEN specifications
+- **verifying-specs** - Completeness/correctness/coherence + debt identification
+- **archiving-specs** - Merge deltas into living specs
 - **writing-plans** - Detailed implementation plans
 - **executing-plans** - Batch execution with checkpoints
 - **dispatching-parallel-agents** - Concurrent subagent workflows
@@ -344,13 +353,16 @@ User: Execute implementation plan with codex-subagent-driven-development
 - **finishing-a-development-branch** - Merge/PR decision workflow
 - **subagent-driven-development** - Fast iteration with quality gates
 
+**Technical Debt Management**
+- **cleanup-and-refactor** *(Claude)* - Orchestrates debt removal in isolated worktree
+- **code-simplification** *(Codex)* - Executes debt removal + static analysis + refactoring
+
 **External Tool Integration**
 - **claude-codex-specs-tdd** - Claude writes specs, dispatches Codex, runs E2E (recommended)
 - **spec-driven-tdd** *(Codex skill)* - Codex reads specs, writes plan, TDD loop, saves progress.md
 - **codex-subagent-driven-development** - Claude writes tests, Codex implements, Claude reviews
 - **codex-cli** - One-off Codex tasks (implement, fix, create)
 - **gemini-cli** - Multimodal analysis (images, PDFs, audio, video, codebases)
-- **search-marketplace** - Search remote marketplace catalog before installing
 
 **Meta** 
 - **writing-skills** - Create new skills following best practices
