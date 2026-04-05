@@ -127,34 +127,11 @@ Check that commands appear:
 
 ### Codex
 
-This is a private repo — install via symlink from your local checkout (skills update instantly, no sync needed):
+Tell Codex:
 
-**Step 1 — Symlink local repo into Codex's skills directory:**
-```bash
-ln -s /path/to/your/superpowerwithcodex ~/.codex/superpowerwithcodex
 ```
-Replace `/path/to/your/superpowerwithcodex` with the actual path where you cloned this repo.
-
-**Step 2 — Create personal skills directory:**
-```bash
-mkdir -p ~/.codex/skills
+Fetch and follow instructions from https://raw.githubusercontent.com/anna-belle-zhang/superpowerwithcodex/refs/heads/main/.codex/INSTALL.md
 ```
-
-**Step 3 — Add to `~/.codex/AGENTS.md`:**
-```markdown
-## Superpowerwithcodex System
-
-<EXTREMELY_IMPORTANT>
-You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex bootstrap` and follow the instructions it returns.
-</EXTREMELY_IMPORTANT>
-```
-
-**Step 4 — Verify:**
-```bash
-~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex bootstrap
-```
-
-You should see skill listings. Codex will now automatically discover and load `superpowerwithcodex:spec-driven-tdd` when dispatched by Claude via `claude-codex-specs-tdd`.
 
 **Detailed docs:** [docs/README.codex.md](docs/README.codex.md)
 

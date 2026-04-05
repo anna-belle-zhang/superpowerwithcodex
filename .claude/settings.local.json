@@ -68,7 +68,11 @@
       "Bash(find tests:*)",
       "Read(//root/.config/superpowers/worktrees/superpowerwithcodex/cleanup-skill-marketplace-search/**)",
       "Bash(rm -rf skills/search-marketplace commands/search.md tests/skills/search-marketplace-*.md)",
-      "Bash(cd ~/.config/superpowers/worktrees/superpowerwithcodex/cleanup-skill-marketplace-search && pytest tests/ -q)"
+      "Bash(cd ~/.config/superpowers/worktrees/superpowerwithcodex/cleanup-skill-marketplace-search && pytest tests/ -q)",
+      "Bash(gh issue:*)",
+      "Bash(gh api:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh release:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

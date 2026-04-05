@@ -1,14 +1,16 @@
 # Installing Superpowerwithcodex for Codex
 
-This is a private repo. Install via symlink from your local checkout — skills update instantly without any sync step.
-
 ## Installation
 
-1. **Symlink local repo into Codex's skills directory**:
+1. **Clone the repo into Codex's skills directory**:
    ```bash
-   ln -s /path/to/your/superpowerwithcodex ~/.codex/superpowerwithcodex
+   git clone https://github.com/anna-belle-zhang/superpowerwithcodex ~/.codex/superpowerwithcodex
    ```
-   Replace `/path/to/your/superpowerwithcodex` with the actual path where this repo lives on your machine.
+   Or clone anywhere and symlink:
+   ```bash
+   git clone https://github.com/anna-belle-zhang/superpowerwithcodex /path/to/superpowerwithcodex
+   ln -s /path/to/superpowerwithcodex ~/.codex/superpowerwithcodex
+   ```
 
 2. **Create personal skills directory**:
    ```bash
@@ -31,3 +33,9 @@ This is a private repo. Install via symlink from your local checkout — skills 
 ```
 
 You should see skill listings and bootstrap instructions. The system is now ready for use.
+
+## Updating
+
+```bash
+cd ~/.codex/superpowerwithcodex && git pull
+```
