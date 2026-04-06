@@ -1,6 +1,6 @@
 ---
 name: codex-cli
-description: Use when user requests Codex for one-off coding tasks (implement function, fix bug, create file) - dispatches to MCP codex-subagent for isolated execution, separate from full TDD workflow
+description: Use when user requests Codex for one-off coding tasks (implement function, fix bug, create file) - dispatches via codex:codex-rescue subagent (OpenAI Codex plugin runtime), separate from full TDD workflow
 ---
 
 # Codex CLI Integration
@@ -26,7 +26,7 @@ Dispatch Codex for quick coding tasks. For full TDD workflows, use codex-subagen
 - Extract requirements (signature, behavior, edge cases)
 
 ### 2. Dispatch
-Use mcp__codex-subagent__spawn_agent with clear prompt containing boundaries and requirements.
+Use the `codex:codex-rescue` subagent (Agent tool with `subagent_type: codex:codex-rescue`) with a clear prompt containing boundaries and requirements.
 
 ### 3. Return Result
 - Present changes (files created/modified, implementation details)
@@ -36,18 +36,18 @@ Use mcp__codex-subagent__spawn_agent with clear prompt containing boundaries and
 
 **Implement function:**
 User: Use Codex to implement fibonacci in src/utils/math.py
-Claude: *dispatches Codex*
+Claude: *dispatches codex:codex-rescue*
 Claude: Created fibonacci(n) in src/utils/math.py with recursion and memoization.
         Would you like me to write tests?
 
 **Fix bug:**
 User: Codex fix the off-by-one error in api/routes.py:45
-Claude: *dispatches with boundary: modify api/routes.py only*
+Claude: *dispatches codex:codex-rescue with boundary: modify api/routes.py only*
 Claude: Fixed index calculation in routes.py:45. Changed `range(len(items))` to `range(len(items)+1)`.
 
 **Create file:**
 User: Let Codex create a logger utility in src/utils/logger.py
-Claude: *dispatches Codex*  
+Claude: *dispatches codex:codex-rescue*
 Claude: Created logger.py with configurable log levels and file rotation.
 
 ## Best Practices

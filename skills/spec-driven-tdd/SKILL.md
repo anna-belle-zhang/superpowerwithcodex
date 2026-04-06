@@ -18,6 +18,14 @@ Activated when dispatch prompt says: `Use superpowerwithcodex:spec-driven-tdd`
 
 ## Process
 
+### Step 0: Detect Test Command
+
+If the dispatch prompt does not specify a test command, auto-detect:
+- `package.json` present → `npm test`
+- `pytest.ini` or `pyproject.toml` with `[tool.pytest]` → `pytest`
+- `Makefile` with `test` target → `make test`
+- Otherwise: ask Claude before proceeding
+
 ### Step 1: Read All Specs
 
 ```bash

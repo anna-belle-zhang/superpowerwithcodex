@@ -30,7 +30,7 @@ Claude is architect and validator. Codex is planner and implementer. Specs are t
 - You want Codex to plan AND test AND implement autonomously
 
 **When NOT to use:**
-- No Codex MCP available → use `subagent-driven-development`
+- Codex plugin not installed → use `subagent-driven-development`
 - Need human review between tasks → use `codex-subagent-driven-development`
 
 ## The Two Entry Modes
@@ -64,10 +64,12 @@ Use superpowerwithcodex:spec-driven-tdd
 Spec directory: docs/specs/<feature>/
 Implement in: src/
 Tests in: tests/
-Test command: npm test
+Test command: <auto-detect from project, or specify: pytest / npm test / etc.>
 ```
 
 That is the entire prompt. Do not embed tests, test code, or implementation details.
+
+**Dispatch via:** `codex:codex-rescue` subagent (Agent tool with `subagent_type: codex:codex-rescue`). No MCP server required.
 
 ## After Codex Returns
 
