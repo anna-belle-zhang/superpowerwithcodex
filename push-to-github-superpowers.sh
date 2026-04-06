@@ -90,9 +90,32 @@ print_info "Repository: $REPO_NAME"
 print_info "Remote: $REMOTE_URL"
 
 # =============================================================================
-# Step 4: Stage All Changes
+# Step 4: Sync Version and Stage All Changes
 # =============================================================================
-print_header "Step 4: Staging Changes"
+print_header "Step 4: Syncing Version + Staging Changes"
+
+# Sync marketplace.json version to match plugin.json
+PLUGIN_VERSION=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])" 2>/dev/null || true)
+if [ -n "$PLUGIN_VERSION" ]; then
+    MARKETPLACE_VERSION=$(python3 -c "import json; print(json.load(open('.claude-plugin/marketplace.json'))['version'])" 2>/dev/null || true)
+    if [ "$PLUGIN_VERSION" != "$MARKETPLACE_VERSION" ]; then
+        print_info "Syncing marketplace.json version: $MARKETPLACE_VERSION → $PLUGIN_VERSION"
+        python3 -c "
+import json, re
+with open('.claude-plugin/marketplace.json', 'r') as f:
+    data = json.load(f)
+data['version'] = '$PLUGIN_VERSION'
+for p in data.get('plugins', []):
+    p['version'] = '$PLUGIN_VERSION'
+with open('.claude-plugin/marketplace.json', 'w') as f:
+    json.dump(data, f, indent=2)
+print('done')
+"
+        print_success "marketplace.json synced to $PLUGIN_VERSION"
+    else
+        print_info "Versions in sync ($PLUGIN_VERSION)"
+    fi
+fi
 
 git add -A
 STAGED_COUNT=$(git diff --cached --name-only | wc -l)
