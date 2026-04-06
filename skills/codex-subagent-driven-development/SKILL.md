@@ -21,15 +21,14 @@ Execute a plan by having Claude write tests first (TDD), dispatch Codex for impl
 - Codex is configured and available
 
 **When NOT to use:**
-- Codex is not available (use `superpowers:subagent-driven-development`)
-- The plan needs revision (use `superpowers:brainstorming` first)
+- Codex plugin not installed (use `superpowerwithcodex:subagent-driven-development`)
+- The plan needs revision (use `superpowerwithcodex:brainstorming` first)
 - Tasks are tightly coupled and require manual sequencing
 
 ## Prerequisites
 
-1. **Codex MCP configured**
-   - `.mcp.json` contains an MCP server named `codex-subagent`
-   - Codex CLI is installed and authenticated (`codex login`)
+1. **Codex plugin installed**
+   - Run `/codex:setup` to verify Codex is installed and authenticated
 
 2. **A written plan**
    - Saved under `docs/plans/YYYY-MM-DD-<feature>.md`
@@ -37,11 +36,11 @@ Execute a plan by having Claude write tests first (TDD), dispatch Codex for impl
 
 ## Execution Mode: Sequential by Default
 
-**Default:** Dispatch one Codex subagent at a time using `spawn_agent`. Complete each task's full TDD cycle (RED → GREEN → review → commit) before starting the next task.
+**Default:** Dispatch one Codex subagent at a time via `codex:codex-rescue`. Complete each task's full TDD cycle (RED → GREEN → review → commit) before starting the next task.
 
-**Parallel only on request:** Only use `spawn_agents_parallel` when the user explicitly asks for parallel execution. Parallel dispatch skips the sequential review-between-tasks gate and risks boundary violations across concurrent tasks.
+**Parallel only on request:** Only dispatch parallel agents when the user explicitly asks. Parallel dispatch skips the sequential review-between-tasks gate and risks boundary violations across concurrent tasks.
 
-**Why sequential:** Each task may depend on the previous task's output. Code review catches issues early. The retry chain requires sequential feedback loops. Parallel dispatch should be a conscious opt-in, not a default.
+**Why sequential:** Each task may depend on the previous task's output. Code review catches issues early. The retry chain requires sequential feedback loops.
 
 ## The Process
 
@@ -49,8 +48,7 @@ Execute a plan by having Claude write tests first (TDD), dispatch Codex for impl
 
 - Read the plan file.
 - Confirm the plan's execution strategy is `codex-subagents` (or ask user to choose).
-- Check Codex availability using the wrapper (`lib/codex-integration.js`).
-- If unavailable, offer fallback to `superpowers:subagent-driven-development`.
+- If Codex unavailable, offer fallback to `superpowerwithcodex:subagent-driven-development`.
 
 ### 2. Create TodoWrite
 
@@ -74,11 +72,12 @@ For each task:
 - Define explicit file boundaries:
   - **Implement in:** code files Codex may modify
   - **Read only:** tests, configs, lockfiles, `docs/specs/`, etc.
-- Build a prompt that includes boundaries and the task steps verbatim.
-- **If specs exist:** include a "Specification Contract" section in the Codex prompt listing all GIVEN/WHEN/THEN scenarios from the task's delta spec as inviolable requirements that the implementation must satisfy.
-- Dispatch **one** Codex subagent via `spawn_agent` (sequential, the default):
-  - `executeWithCodex({ prompt, workingDir, retryCount, onProgress })`
-  - **Do NOT use `spawn_agents_parallel`** unless the user explicitly requested parallel execution.
+- Build a prompt that includes:
+  - Writable and read-only file boundaries
+  - Task requirements verbatim
+  - Test command to verify
+  - **If specs exist:** a "Specification Contract" section listing all GIVEN/WHEN/THEN scenarios as inviolable requirements
+- Dispatch via Agent tool with `subagent_type: codex:codex-rescue` (sequential, one at a time).
 - Wait for the subagent to complete before proceeding to Step 3c.
 
 #### Step 3c: Verify tests
@@ -88,8 +87,8 @@ For each task:
 - If tests fail, enter the retry chain.
 
 **Retry chain (recommended default):**
-1. Codex retry 1: send failing test output + guidance
-2. Codex retry 2: add explicit “research required” guidance + retry
+1. Codex retry 1: re-dispatch `codex:codex-rescue` with failing test output + guidance
+2. Codex retry 2: add explicit "research required" guidance + retry
 3. Claude fix 1: Claude implements the fix manually
 4. Claude fix 2: Claude researches + fixes
 5. Human escalation: ask the user whether to fix, skip, or revise plan
@@ -102,10 +101,9 @@ For each task:
 - Verify file boundaries:
   - If Codex modified any read-only files, revert those changes and retry.
 - **If specs exist:** verify all GIVEN/WHEN/THEN scenarios from the task's delta spec are covered by tests. An uncovered scenario is a Critical review issue.
-- Dispatch a code-reviewer subagent:
-  - Use the template at `skills/requesting-code-review/code-reviewer.md`
+- Review the diff manually or dispatch a code-reviewer subagent.
 
-If review issues exist, feed them into the retry chain (as `failure_type: review_issues`).
+If review issues exist, feed them into the retry chain.
 
 #### Step 3e: Commit and continue
 
@@ -118,27 +116,16 @@ If review issues exist, feed them into the retry chain (as `failure_type: review
 
 After all tasks:
 - Run the full relevant test suite
-- Dispatch a final code review for the full diff
+- Review the full diff
 - Confirm all plan requirements are met
 
 ### 5. Finish
 
-- Announce: “I’m using the finishing-a-development-branch skill to complete this work.”
-- **REQUIRED SUB-SKILL:** Use `superpowers:finishing-a-development-branch`
-
-## Integration: Codex Wrapper Library
-
-This workflow expects `superpowers-main/lib/codex-integration.js`:
-- `checkCodexAvailability()`
-- `executeWithCodex(config)`
-- `retryWithFeedback(originalPrompt, feedback, attempt, maxRetries)`
-- `detectBoundaryViolations(changedFiles, boundaries)`
-- `buildFileBoundaries(task)`
-- `formatBoundaryInstructions(boundaries)`
+- Announce: "I'm using the finishing-a-development-branch skill to complete this work."
+- **REQUIRED SUB-SKILL:** Use `superpowerwithcodex:finishing-a-development-branch`
 
 ## Required Sub-Skills
 
-- `superpowers:test-driven-development`
-- `superpowers:requesting-code-review`
-- `superpowers:finishing-a-development-branch`
-
+- `superpowerwithcodex:test-driven-development`
+- `superpowerwithcodex:requesting-code-review`
+- `superpowerwithcodex:finishing-a-development-branch`

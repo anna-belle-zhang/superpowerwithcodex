@@ -73,7 +73,8 @@
       "Bash(gh api:*)",
       "Bash(gh pr:*)",
       "Bash(gh release:*)",
-      "Skill(codex:rescue)"
+      "Skill(codex:rescue)",
+      "Bash(pytest tests/test_string_utils.py -q)"
     ]
   },
   "enableAllProjectMcpServers": true,
