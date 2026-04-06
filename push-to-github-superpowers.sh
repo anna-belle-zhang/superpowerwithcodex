@@ -90,18 +90,17 @@ print_info "Repository: $REPO_NAME"
 print_info "Remote: $REMOTE_URL"
 
 # =============================================================================
-# Step 4: Stage Changes
+# Step 4: Stage All Changes
 # =============================================================================
 print_header "Step 4: Staging Changes"
 
-if [ -n "$(git status --porcelain)" ]; then
-    print_info "Adding all changes..."
-    git add -A
-
-    STAGED_COUNT=$(git diff --cached --name-only | wc -l)
+git add -A
+STAGED_COUNT=$(git diff --cached --name-only | wc -l)
+if [ "$STAGED_COUNT" -gt 0 ]; then
     print_success "Staged $STAGED_COUNT files"
+    git diff --cached --name-only | while read -r f; do print_info "  $f"; done
 else
-    print_info "No changes to stage"
+    print_info "Nothing new to stage"
 fi
 
 # =============================================================================
@@ -137,7 +136,7 @@ if ! git diff --cached --quiet; then
     COMMIT_SHA=$(git rev-parse --short HEAD)
     print_success "Commit created: $COMMIT_SHA"
 else
-    print_info "No staged changes to commit"
+    print_info "Nothing to commit — already up to date"
 fi
 
 # =============================================================================
