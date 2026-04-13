@@ -74,7 +74,14 @@
       "Bash(gh pr:*)",
       "Bash(gh release:*)",
       "Skill(codex:rescue)",
-      "Bash(pytest tests/test_string_utils.py -q)"
+      "Bash(pytest tests/test_string_utils.py -q)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(cp /root/.claude/plugins/cache/openai-codex/codex/1.0.2/commands/rescue.md /tmp/rescue.md.bak)",
+      "Bash(sed -i 's/, Agent\\(codex:codex-rescue\\)//' /root/.claude/plugins/cache/openai-codex/codex/1.0.2/commands/rescue.md)",
+      "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/hooks.json /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/hooks.json)",
+      "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/run-hook.cmd /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/run-hook.cmd)",
+      "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/session-start.sh /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/session-start.sh)",
+      "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/prompt-submit.sh /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/prompt-submit.sh)"
     ]
   },
   "enableAllProjectMcpServers": true,

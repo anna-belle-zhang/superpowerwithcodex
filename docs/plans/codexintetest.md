@@ -37,11 +37,11 @@ codex e --full-auto "curl -s https://api.github.com/zen"
 
 | Mode | Network | Filesystem | Use Case |
 |------|---------|------------|----------|
-| `workspace-read` | Blocked | Read-only | Safe exploration |
-| `workspace-write` | Configurable | Project dir only | Development (default) |
-| `full-auto` | Configurable | Project dir only | Autonomous execution |
+| `read-only` | Blocked | Read-only | Review, diagnosis |
+| `workspace-write` | Configurable | Project dir only | Tasks, implementation (default for `/codex:rescue`) |
+| `danger-full-access` | Unrestricted | Unrestricted | Externally sandboxed environments only |
 
-The `network_access = true` setting in config applies to `workspace-write` and `full-auto` modes.
+The `network_access = true` setting in config applies to `workspace-write` mode.
 
 ---
 
@@ -54,29 +54,6 @@ codex e --full-auto \
   --sandbox workspace-write \
   -c 'sandbox_workspace_write.network_access=true' \
   "your prompt here"
-```
-
----
-
-## WSL-Specific Setup
-
-### Docker Daemon
-
-Ensure Docker is running in WSL:
-
-```bash
-sudo service docker start
-```
-
-Or if using Docker Desktop, ensure WSL integration is enabled in Docker Desktop settings.
-
-### Docker Network Bridge
-
-If network issues persist in WSL, verify Docker networking:
-
-```bash
-docker network ls
-docker run --rm alpine ping -c 1 google.com
 ```
 
 ---
@@ -98,9 +75,6 @@ See: `docs/plans/2026-01-25-ralph-codex-e2e-design.md`
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | `network is unreachable` | Network disabled | Add config to `~/.codex/config.toml` |
-| `docker: command not found` | Docker not installed | Install Docker Desktop or `apt install docker.io` |
-| `permission denied` on docker | Not in docker group | `sudo usermod -aG docker $USER` then re-login |
-| `Cannot connect to Docker daemon` | Daemon not running | `sudo service docker start` |
 | Config file ignored | Wrong path | Must be `~/.codex/config.toml` (not `~/.config/codex/`) |
 | Config section ignored | Wrong TOML syntax | Use `[sandbox_workspace_write]` (underscores, not dots) |
 | `python.exe: Permission denied` | Using Windows az CLI | Install native Linux az: `curl -sL https://aka.ms/InstallAzureCLIDeb \| sudo bash` |
@@ -199,10 +173,6 @@ Common pitfalls discovered during setup:
 - `az account show` works offline (reads cached subscription info)
 - `az group list` and other API calls require network + valid tokens
 - Sandbox can't write to `~/.azure/commands/` for logging → use `AZURE_CONFIG_DIR=/tmp/azure`
-
-### MCP Subagent Server
-- Config changes require **Claude Code restart** for MCP server to reload
-- The `codex-as-mcp` server spawns fresh Codex processes that read `~/.codex/config.toml`
 
 ### Verification Commands
 ```bash
