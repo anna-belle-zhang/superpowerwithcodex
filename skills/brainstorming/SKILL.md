@@ -20,6 +20,10 @@ Start by understanding the current project context, then ask questions one at a 
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
 - Focus on understanding: purpose, constraints, success criteria
 
+**Discovery (after understanding purpose):**
+- Dispatch a subagent to gather current info relevant to the stated purpose: existing types/schemas, API endpoints, client integrations, recent commits touching this domain
+- Use the subagent report to anchor the design — don't propose approaches until you know what already exists
+
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
 - Present options conversationally with your recommendation and reasoning
