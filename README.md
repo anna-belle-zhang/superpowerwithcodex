@@ -150,7 +150,39 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 Superpowers can use Codex subagents for implementation in a strict TDD workflow where Claude writes tests and reviews.
 
 - Setup and workflow: [docs/codex-integration.md](docs/codex-integration.md)
+- Full plugin reference: [docs/codex-plugin.md](docs/codex-plugin.md)
 - Skill: `superpowerwithcodex:codex-subagent-driven-development`
+
+### Codex Permissions
+
+Codex runs inside a sandbox. **Write access is not on by default** — you must configure it in `~/.codex/config.toml`.
+
+| Sandbox mode | File writes | When to use |
+|---|---|---|
+| `read-only` | No | Review, diagnosis only |
+| `workspace-write` | Project dir only | Implementation tasks (required for TDD) |
+| `danger-full-access` | Unrestricted | Only in externally sandboxed environments |
+
+**Minimum required config** for implementation tasks:
+
+```toml
+# ~/.codex/config.toml
+[sandbox_workspace_write]
+network_access = true   # needed for package managers, test suites hitting external services
+```
+
+Without `workspace-write`, Codex can read but cannot write files. Without `network_access = true`, package installs and API-dependent tests will fail silently.
+
+**How write access flows:**
+```
+Agent(codex:codex-rescue)
+  └─ Bash: node codex-companion.mjs task --write [prompt]
+       └─ Codex app-server (sandbox: workspace-write)
+```
+
+The `--write` flag is passed automatically by the skills. You only need to configure the sandbox mode once in `~/.codex/config.toml`.
+
+See [docs/codex-plugin.md](docs/codex-plugin.md) for troubleshooting network and permission issues.
 
 ## End-to-End Full Chain (with Structured Specs)
 
