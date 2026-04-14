@@ -7,7 +7,7 @@ Execute one-off Codex coding tasks with clear file boundaries and return concise
 Execute Codex commands for specific coding tasks. You are NOT the full TDD workflow - that's handled by codex-subagent-driven-development.
 
 **Your job:**
-- Run mcp__codex-subagent__spawn_agent for single tasks
+- Dispatch codex:codex-rescue subagent for single tasks
 - Enforce file boundaries strictly
 - Return summary of changes made
 - Suggest next steps (tests, commits, modifications)
@@ -40,8 +40,9 @@ Extract:
 
 ### 2. Build Codex Prompt
 
-```python
-prompt = """
+Build a clear prompt, then dispatch via the `codex:codex-rescue` subagent (Agent tool with `subagent_type: codex:codex-rescue`):
+
+```
 Task: [Clear description]
 
 File Boundaries:
@@ -54,10 +55,9 @@ Requirements:
 
 Verification:
 - [How to test]
-"""
-
-mcp__codex-subagent__spawn_agent(prompt=prompt)
 ```
+
+The subagent runs `codex-companion.mjs task --write` internally, which gives Codex workspace-write sandbox access.
 
 ### 3. Execute and Process
 
@@ -100,27 +100,23 @@ File: src/utils/math.py
 Boundaries: Create src/utils/math.py
 ```
 
-**Execute:**
-```python
-mcp__codex-subagent__spawn_agent(
-    prompt="""
-    Task: Implement fibonacci function
+**Execute:** Dispatch `codex:codex-rescue` subagent with prompt:
+```
+Task: Implement fibonacci function
 
-    File Boundaries:
-    - Implement in: src/utils/math.py
-    - Read only: (none)
+File Boundaries:
+- Implement in: src/utils/math.py
+- Read only: (none)
 
-    Requirements:
-    - Function signature: fibonacci(n: int) -> int
-    - Handle n < 0 by raising ValueError
-    - Use memoization for performance
-    - Include type hints and docstring
+Requirements:
+- Function signature: fibonacci(n: int) -> int
+- Handle n < 0 by raising ValueError
+- Use memoization for performance
+- Include type hints and docstring
 
-    Verification:
-    - Test: fibonacci(10) should return 55
-    - Test: fibonacci(-1) should raise ValueError
-    """
-)
+Verification:
+- Test: fibonacci(10) should return 55
+- Test: fibonacci(-1) should raise ValueError
 ```
 
 **Return:**
@@ -148,27 +144,23 @@ User: Codex fix the off-by-one error in api/routes.py:45
 File: api/routes.py:45 has `range(len(items))` but should include last item
 ```
 
-**Execute:**
-```python
-mcp__codex-subagent__spawn_agent(
-    prompt="""
-    Task: Fix off-by-one error in range calculation
+**Execute:** Dispatch `codex:codex-rescue` subagent with prompt:
+```
+Task: Fix off-by-one error in range calculation
 
-    File Boundaries:
-    - Modify: api/routes.py (line 45 specifically)
-    - Read only: tests/test_routes.py (for context)
+File Boundaries:
+- Modify: api/routes.py (line 45 specifically)
+- Read only: tests/test_routes.py (for context)
 
-    Requirements:
-    - Line 45 currently: for i in range(len(items))
-    - Should be: for i in range(len(items) + 1) OR use enumerate
-    - Ensure all items are processed including last one
-    - Don't break existing functionality
+Requirements:
+- Line 45 currently: for i in range(len(items))
+- Should be: for i in range(len(items) + 1) OR use enumerate
+- Ensure all items are processed including last one
+- Don't break existing functionality
 
-    Verification:
-    - Run existing tests: pytest tests/test_routes.py
-    - All tests should pass
-    """
-)
+Verification:
+- Run existing tests: pytest tests/test_routes.py
+- All tests should pass
 ```
 
 **Return:**
@@ -198,28 +190,24 @@ Should I commit this fix?
 User: Let Codex create a logger utility
 ```
 
-**Execute:**
-```python
-mcp__codex-subagent__spawn_agent(
-    prompt="""
-    Task: Create logger utility module
+**Execute:** Dispatch `codex:codex-rescue` subagent with prompt:
+```
+Task: Create logger utility module
 
-    File Boundaries:
-    - Create: src/utils/logger.py
-    - Read only: setup.py, requirements.txt (check dependencies)
+File Boundaries:
+- Create: src/utils/logger.py
+- Read only: setup.py, requirements.txt (check dependencies)
 
-    Requirements:
-    - Configurable log levels (DEBUG, INFO, WARNING, ERROR)
-    - File and console output
-    - Log rotation (10MB max, 5 backup files)
-    - JSON formatting option
-    - Simple API: logger.info("message"), logger.error("error")
+Requirements:
+- Configurable log levels (DEBUG, INFO, WARNING, ERROR)
+- File and console output
+- Log rotation (10MB max, 5 backup files)
+- JSON formatting option
+- Simple API: logger.info("message"), logger.error("error")
 
-    Verification:
-    - Can import: from src.utils.logger import get_logger
-    - Can log: logger = get_logger(); logger.info("test")
-    """
-)
+Verification:
+- Can import: from src.utils.logger import get_logger
+- Can log: logger = get_logger(); logger.info("test")
 ```
 
 **Return:**
@@ -307,7 +295,7 @@ Note: Requires python-json-logger. Add to requirements.txt?
 ## Quick Reference
 
 **Your tools:**
-- mcp__codex-subagent__spawn_agent (run Codex)
+- Agent with `subagent_type: codex:codex-rescue` (run Codex)
 - Read (check files exist, read context)
 - Bash (run verification commands)
 
