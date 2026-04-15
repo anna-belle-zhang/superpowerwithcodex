@@ -66,7 +66,7 @@ const claudeBin = process.platform === 'win32' ? 'claude.cmd' : 'claude';
 const args = [
   '-p', prompt,
   '--output-format', 'stream-json',  // JSONL streaming, not single envelope
-  '--bare',                           // skip hooks/plugins/CLAUDE.md auto-load
+  '--verbose',                        // REQUIRED: stream-json in -p mode needs --verbose
   '--max-turns', String(maxTurns),
   '--model', model,
 ];
@@ -86,6 +86,9 @@ const child = spawn(claudeBin, args, {
 });
 ```
 
+> **Note:** `--bare` is not a valid CC flag (silently ignored). To skip hook loading,
+> use `--no-session-persistence` in future versions if/when CC supports it.
+
 ## Recursion Guard
 
 Set `CLAUDE_COMPANION_DEPTH=1` in the child's env. At entry, check:
@@ -100,20 +103,44 @@ This prevents CC from calling back into this companion in a loop.
 
 ## Output Handling
 
-`stream-json` emits JSONL — one JSON object per line. Event types:
+`stream-json` emits JSONL — one JSON object per line. Verified event shapes (CC v2.1.109):
 
-- `assistant` — streaming text chunks (relay to stdout in non-`--json` mode)
-- `result` — final result with `result` field and `cost_usd`
-- `system` — metadata (ignore or log to stderr)
+```jsonc
+// system:init — emitted first, contains model name
+{ "type": "system", "subtype": "init", "model": "claude-sonnet-4-6", ... }
 
-**Non-`--json` mode:** relay `assistant` text as it arrives; print final `result.result` at close.
+// assistant — text is nested inside message.content[], NOT a top-level "text" field
+{ "type": "assistant", "message": { "content": [{ "type": "text", "text": "..." }], ... } }
+
+// result — final output; cost is "total_cost_usd", model under "modelUsage" keys
+{ "type": "result", "result": "...", "total_cost_usd": 0.001,
+  "modelUsage": { "claude-sonnet-4-6": { ... } } }
+```
+
+**Parsing assistant text:**
+```js
+const content = event.message?.content ?? [];
+const text = content.filter(c => c.type === 'text').map(c => c.text).join('');
+```
+
+**Parsing result:**
+```js
+finalResult = event.result;
+costUsd = event.total_cost_usd;              // NOT event.cost_usd
+resultModel = Object.keys(event.modelUsage ?? {})[0];  // NOT event.model
+```
+
+**Non-`--json` mode:** stream `assistant` text as it arrives; fall back to `result.result` if no assistant text received.
 
 **`--json` mode:** buffer everything, emit one envelope at close:
 ```json
-{ "status": 0, "result": "...", "model": "...", "costUsd": 0.0012 }
+{ "status": 0, "result": "...", "model": "claude-sonnet-4-6", "costUsd": 0.001 }
 ```
 
 **stderr:** always relay `child.stderr` directly to `process.stderr`.
+
+> **Ignored event types:** `system:hook_started`, `system:hook_response`, `rate_limit_event`
+> — these are emitted by `--verbose` mode but carry no output needed by the caller.
 
 ## Error Handling
 
@@ -129,7 +156,7 @@ This prevents CC from calling back into this companion in a loop.
 
 - Read-only by default — safe for analysis tasks (CC reads files, returns text)
 - `--write` is explicit opt-in — Codex caller must consciously request file mutation
-- `--bare` prevents CLAUDE.md and plugins from expanding the tool surface unexpectedly
+- `--allowedTools` is the only tool-surface control — `--bare` is not a valid CC flag
 - `--max-turns` caps runaway sessions
 - No `--dangerously-skip-permissions` / bypassPermissions — use `--allowedTools` instead
 
@@ -142,7 +169,7 @@ Codex session
        │
        ├─ preflight: binaryAvailable('claude')
        ├─ recursion guard: check CLAUDE_COMPANION_DEPTH
-       ├─ spawn: claude -p "..." --output-format stream-json --bare ...
+       ├─ spawn: claude -p "..." --output-format stream-json --verbose ...
        │    │
        │    ├─ stream-json JSONL events → stdout
        │    └─ errors → stderr
