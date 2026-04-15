@@ -153,7 +153,7 @@ export function runTaskCommand(argv, io = {}) {
       prompt,
       "--output-format",
       "stream-json",
-      "--bare",
+      "--verbose",          // required by CC for stream-json in -p mode
       "--max-turns",
       String(maxTurns),
       "--model",
@@ -193,9 +193,13 @@ export function runTaskCommand(argv, io = {}) {
         stdoutBuffer,
         (event) => {
           if (event.type === "assistant") {
-            const text = String(event.text ?? "");
+            const content = event.message?.content ?? [];
+            const text = content
+              .filter((c) => c.type === "text")
+              .map((c) => String(c.text ?? ""))
+              .join("");
             assistantText += text;
-            if (!jsonMode) {
+            if (!jsonMode && text) {
               stdout.write(text);
             }
             return;
@@ -203,8 +207,11 @@ export function runTaskCommand(argv, io = {}) {
 
           if (event.type === "result") {
             finalResult = String(event.result ?? "");
-            costUsd = Number(event.cost_usd ?? 0);
-            resultModel = String(event.model ?? resultModel);
+            costUsd = Number(event.total_cost_usd ?? 0);
+            const modelKeys = Object.keys(event.modelUsage ?? {});
+            if (modelKeys.length > 0) {
+              resultModel = modelKeys[0];
+            }
           }
         },
         stderr
@@ -226,9 +233,13 @@ export function runTaskCommand(argv, io = {}) {
       if (stdoutBuffer.trim()) {
         stdoutBuffer = flushJsonLines(stdoutBuffer + "\n", (event) => {
           if (event.type === "assistant") {
-            const text = String(event.text ?? "");
+            const content = event.message?.content ?? [];
+            const text = content
+              .filter((c) => c.type === "text")
+              .map((c) => String(c.text ?? ""))
+              .join("");
             assistantText += text;
-            if (!jsonMode) {
+            if (!jsonMode && text) {
               stdout.write(text);
             }
             return;
@@ -236,8 +247,11 @@ export function runTaskCommand(argv, io = {}) {
 
           if (event.type === "result") {
             finalResult = String(event.result ?? "");
-            costUsd = Number(event.cost_usd ?? 0);
-            resultModel = String(event.model ?? resultModel);
+            costUsd = Number(event.total_cost_usd ?? 0);
+            const modelKeys = Object.keys(event.modelUsage ?? {});
+            if (modelKeys.length > 0) {
+              resultModel = modelKeys[0];
+            }
           }
         }, stderr);
       }
