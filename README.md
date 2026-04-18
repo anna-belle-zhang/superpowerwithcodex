@@ -1,6 +1,6 @@
 # Superpowers with Codex Integration
 
-**Fork of [obra/superpowers](https://github.com/obra/superpowers) with Codex MCP integration**
+**Fork of [obra/superpowers](https://github.com/obra/superpowers) with Codex, open-specs integration**
 
 Superpowers is a complete software development workflow for your coding agents, built on top of composable "skills". This fork adds **Codex integration** enabling two powerful TDD workflows:
 

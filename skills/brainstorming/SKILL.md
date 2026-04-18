@@ -20,9 +20,11 @@ Start by understanding the current project context, then ask questions one at a 
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
 - Focus on understanding: purpose, constraints, success criteria
 
-**Discovery (after understanding purpose):**
-- Dispatch a subagent to gather current info relevant to the stated purpose: existing types/schemas, API endpoints, client integrations, recent commits touching this domain
-- Use the subagent report to anchor the design — don't propose approaches until you know what already exists
+**Deep survey (after understanding purpose):**
+- Default to a Codex subagent for the survey unless another agent is explicitly better suited
+- Have the subagent gather both local and external context relevant to the stated purpose: existing types/schemas, API endpoints, client integrations, recent commits touching this domain, and internet research for standards, vendor docs, libraries, or prior art that materially affect the design
+- Tell the subagent to separate confirmed facts from inferences and to cite the external sources it used
+- Use the survey report to anchor the design — don't propose approaches until you know what already exists locally and what external constraints or options matter
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
