@@ -1,5 +1,16 @@
 # Superpowers Release Notes
 
+## v4.0.8 (2026-04-18)
+
+### Fixed
+
+- **Codex Canonical Install Path**: Removed the legacy `.codex/superpowers-*` compatibility entrypoints from the repository and made `superpowerwithcodex` the only supported Codex path
+  - `.codex/superpowerwithcodex-codex` is now a real canonical entrypoint instead of a symlink to `superpowers-codex`
+  - `.codex/INSTALL.md` and `.codex/superpowerwithcodex-bootstrap.md` now reference only `~/.codex/superpowerwithcodex/...`
+  - Added a regression test to prevent old `.codex/superpowers` references from returning
+
+---
+
 ## v3.6.2 (2025-12-03)
 
 ### Fixed

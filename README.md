@@ -46,46 +46,6 @@ brainstorm → write-specs → dispatch Codex → Codex: reads specs, writes pla
 
 📖 [Complete Guide](docs/quickstart-codex-subagent-workflow.md)
 
-### 3. **Multimodal Analysis** (`gemini-cli`)
-- ✅ **Analyze Images**: UI/UX feedback, diagram explanation
-- ✅ **Process Documents**: PDF summarization, long-form content
-- ✅ **Audio/Video**: Transcription, content extraction
-- ✅ **Codebase Scanning**: Security audits, architecture analysis
-- ✅ **Context Isolation**: Long output stays in agent, only summaries returned
-
-📖 [Gemini Integration Guide](docs/gemini-cli-integration.md)
-
-### 4. **Quick Coding Tasks** (`codex-cli`)
-- ✅ **One-Off Implementations**: Single functions, quick features
-- ✅ **Bug Fixes**: Targeted fixes with file boundaries
-- ✅ **File Creation**: Generate utilities from descriptions
-- ✅ **Fast Iteration**: No full TDD when you need speed
-- ✅ **Boundary Enforcement**: Strict writable vs read-only control
-
-📖 [Codex CLI Guide](docs/codex-cli-integration.md)
-
-## How it works
-
-It starts from the moment you fire up your coding agent. As soon as it sees that you're building something, it *doesn't* just jump into trying to write code. Instead, it steps back and asks you what you're really trying to do. 
-
-Once it's teased a spec out of the conversation, it shows it to you in chunks short enough to actually read and digest. 
-
-After you've signed off on the design, your agent puts together an implementation plan that's clear enough for an enthusiastic junior engineer with poor taste, no judgement, no project context, and an aversion to testing to follow. It emphasizes true red/green TDD, YAGNI (You Aren't Gonna Need It), and DRY. 
-
-Next up, once you say "go", it launches a *subagent-driven-development* process, having agents work through each engineering task, inspecting and reviewing their work, and continuing forward. It's not uncommon for Claude to be able to work autonomously for a couple hours at a time without deviating from the plan you put together.
-
-There's a bunch more to it, but that's the core of the system. And because the skills trigger automatically, you don't need to do anything special. Your coding agent just has Superpowers.
-
-
-## Sponsorship
-
-If Superpowers has helped you do stuff that makes money and you are so inclined, I'd greatly appreciate it if you'd consider [sponsoring my opensource work](https://github.com/sponsors/obra).
-
-Thanks! 
-
-- Jesse
-
-
 ## Installation
 
 **Note:** Installation differs by platform. Claude Code has a built-in plugin system. Codex and OpenCode require manual setup.
@@ -135,15 +95,12 @@ Fetch and follow instructions from https://raw.githubusercontent.com/anna-belle-
 
 **Detailed docs:** [docs/README.codex.md](docs/README.codex.md)
 
-### OpenCode
+### GitHub Copilot CLI
 
-Tell OpenCode:
-
+```bash
+copilot plugin marketplace add anna-belle-zhang/superpowerwithcodex
+copilot plugin install superpowerwithcodex@superpowerwithcodex
 ```
-Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.opencode/INSTALL.md
-```
-
-**Detailed docs:** [docs/README.opencode.md](docs/README.opencode.md)
 
 ## Codex Integration (Optional)
 
@@ -214,8 +171,6 @@ brainstorm → write-specs → worktree → write-plan → execute → verify-sp
    - **A) Specs-first** (recommended): Claude writes specs → Codex reads specs, plans, tests, implements → Claude runs E2E
    - **B) Tests-first**: Claude writes tests → Codex implements → Claude reviews
    - **C) Claude subagents**: Fresh subagent per task with review between tasks
-   - **D) Parallel session**: Separate session with batch execution and checkpoints
-   - **E) Ralph-Codex-E2E**: Fully autonomous loop (walk away)
 
 6. **Verify specs** — `/superpowerwithcodex:verify-specs`
    - **Completeness:** every GIVEN/WHEN/THEN scenario has a passing test
@@ -248,24 +203,6 @@ brainstorm → write-specs → worktree → write-plan → execute → verify-sp
 
 ---
 
-## The Basic Workflow
-
-1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
-
-2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
-
-3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
-
-4. **codex-subagent-driven-development**, **subagent-driven-development**, or **executing-plans** - Activates with plan. Uses Codex for implementation (optional) or dispatches fresh subagent per task (same session, fast iteration) or executes in batches (parallel session, human checkpoints).
-
-5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
-
-6. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
-
-7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree.
-
-**The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
-
 ## Quick Usage Examples
 
 ### Specs-First Feature Development (Recommended)
@@ -282,71 +219,20 @@ User: /superpowerwithcodex:claude-codex-specs-tdd
 # → Claude runs E2E tests, validates spec coverage
 ```
 
-### Tests-First Feature Development
-```bash
-# Design first
-User: /superpowerwithcodex:brainstorm Build a user authentication system
-
-# Plan implementation
-User: /superpowerwithcodex:write-plan Create the auth system
-
-# Execute with TDD (Claude writes tests, Codex implements, Claude reviews)
-User: Execute with codex-subagent-driven-development
-```
-
-### Quick Coding Tasks
-```bash
-# Implement single function
-User: Use Codex to implement fibonacci in src/utils/math.py
-
-# Fix specific bug
-User: Codex fix the off-by-one error in routes.py:45
-
-# Create utility file
-User: Let Codex create a logger utility with rotation
-```
-
-### Multimodal Analysis
-```bash
-# Analyze image
-User: Use Gemini to analyze screenshot.png for UI issues
-
-# Summarize document
-User: Gemini help me summarize research-paper.pdf
-
-# Scan codebase
-User: Let Gemini scan ./src for security vulnerabilities
-```
-
-### Combined Workflow
-```bash
-# 1. Research with Gemini
-User: Use Gemini to analyze competitor-ui.png
-
-# 2. Design with Claude
-User: /superpowerwithcodex:brainstorm Design our UI based on insights
-
-# 3. Quick utilities with Codex
-User: Use Codex to create theme.css
-
-# 4. Main feature with full TDD
-User: Execute implementation plan with codex-subagent-driven-development
-```
-
 ## What's Inside
 
 ### Skills Library
-
-**Testing**
-- **test-driven-development** - RED-GREEN-REFACTOR cycle
-- **condition-based-waiting** - Async test patterns
-- **testing-anti-patterns** - Common pitfalls to avoid
 
 **Debugging** 
 - **systematic-debugging** - 4-phase root cause process
 - **root-cause-tracing** - Find the real problem
 - **verification-before-completion** - Ensure it's actually fixed
 - **defense-in-depth** - Multiple validation layers
+
+**Technical Debt Management**
+- **cleanup-and-refactor** *(Claude)* - Orchestrates debt removal in isolated worktree
+- **code-simplification** *(Codex)* - Executes debt removal + static analysis + refactoring
+
 
 **Collaboration**
 - **brainstorming** - Socratic design refinement
@@ -361,10 +247,6 @@ User: Execute implementation plan with codex-subagent-driven-development
 - **using-git-worktrees** - Parallel development branches
 - **finishing-a-development-branch** - Merge/PR decision workflow
 - **subagent-driven-development** - Fast iteration with quality gates
-
-**Technical Debt Management**
-- **cleanup-and-refactor** *(Claude)* - Orchestrates debt removal in isolated worktree
-- **code-simplification** *(Codex)* - Executes debt removal + static analysis + refactoring
 
 **External Tool Integration**
 - **claude-codex-specs-tdd** - Claude writes specs, dispatches Codex, runs E2E (recommended)

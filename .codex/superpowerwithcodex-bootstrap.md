@@ -1,7 +1,7 @@
 # Superpowerwithcodex Bootstrap for Codex
 
 <EXTREMELY_IMPORTANT>
-You have superpowers.
+You have superpowerwithcodex.
 
 **Tool for running skills:**
 - `~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex use-skill <skill-name>`

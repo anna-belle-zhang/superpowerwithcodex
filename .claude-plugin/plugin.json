@@ -1,7 +1,7 @@
 {
   "name": "superpowerwithcodex",
   "description": "Superpowers with Codex integration - TDD workflows where Claude writes tests and Codex implements code",
-  "version": "4.0.7",
+  "version": "4.0.8",
   "author": {
     "name": "Anna Belle Zhang",
     "email": "anna.belle.zhang@example.com"

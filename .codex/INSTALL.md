@@ -22,7 +22,7 @@
    ## Superpowerwithcodex System
 
    <EXTREMELY_IMPORTANT>
-   You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex bootstrap` and follow the instructions it returns.
+   You have superpowerwithcodex. Superpowerwithcodex teaches you new skills and capabilities. RIGHT NOW run: `~/.codex/superpowerwithcodex/.codex/superpowerwithcodex-codex bootstrap` and follow the instructions it returns.
    </EXTREMELY_IMPORTANT>
    ```
 

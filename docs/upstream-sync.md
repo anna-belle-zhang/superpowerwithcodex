@@ -105,7 +105,7 @@ Architecturally incompatible with our fork's design choices.
 |---|---|---|
 | `bdd45c7`–`715e18e` | Gemini CLI extension chain (5 commits) | Upstream uses `gemini-extension.json`; we use `skills/gemini-cli/SKILL.md` + `agents/gemini-executor.md`. Different architecture, incompatible. |
 | `8c8c5e8`–`777a977` | sync-to-codex-plugin mirroring chain (6 commits) | Upstream's plugin-sync automation conflicts with our plugin identity (anna-belle-zhang/superpowerwithcodex). |
-| `8b16692` | Add Copilot CLI tool mapping | We don't use Copilot; skip unless needed. |
+| ~~`8b16692`~~ | ~~Add Copilot CLI tool mapping~~ | ✅ Done — added references/copilot-tools.md and Platform Notes section to using-superpowers. |
 
 ---
 

@@ -1,1 +1,243 @@
-/root/.codex/superpowerwithcodex/.codex/superpowers-codex
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const skillsCore = require('../lib/skills-core');
+
+// Paths
+const homeDir = os.homedir();
+const superpowerwithcodexSkillsDir = path.join(homeDir, '.codex', 'superpowerwithcodex', 'skills');
+const personalSkillsDir = path.join(homeDir, '.codex', 'skills');
+const bootstrapFile = path.join(homeDir, '.codex', 'superpowerwithcodex', '.codex', 'superpowerwithcodex-bootstrap.md');
+const superpowerwithcodexRepoDir = path.join(homeDir, '.codex', 'superpowerwithcodex');
+
+// Utility functions
+function printSkill(skillPath, sourceType) {
+    const skillFile = path.join(skillPath, 'SKILL.md');
+    const relPath = sourceType === 'personal'
+        ? path.relative(personalSkillsDir, skillPath)
+        : path.relative(superpowerwithcodexSkillsDir, skillPath);
+
+    if (sourceType === 'personal') {
+        console.log(relPath.replace(/\\/g, '/'));
+    } else {
+        console.log(`superpowerwithcodex:${relPath.replace(/\\/g, '/')}`);
+    }
+
+    const { name, description } = skillsCore.extractFrontmatter(skillFile);
+
+    if (description) console.log(`  ${description}`);
+    console.log('');
+}
+
+function runFindSkills() {
+    console.log('Available skills:');
+    console.log('==================');
+    console.log('');
+
+    const foundSkills = new Set();
+
+    const personalSkills = skillsCore.findSkillsInDir(personalSkillsDir, 'personal', 2);
+    for (const skill of personalSkills) {
+        const relPath = path.relative(personalSkillsDir, skill.path);
+        foundSkills.add(relPath);
+        printSkill(skill.path, 'personal');
+    }
+
+    const superpowerwithcodexSkills = skillsCore.findSkillsInDir(superpowerwithcodexSkillsDir, 'superpowerwithcodex', 1);
+    for (const skill of superpowerwithcodexSkills) {
+        const relPath = path.relative(superpowerwithcodexSkillsDir, skill.path);
+        if (!foundSkills.has(relPath)) {
+            printSkill(skill.path, 'superpowerwithcodex');
+        }
+    }
+
+    console.log('Usage:');
+    console.log('  superpowerwithcodex-codex use-skill <skill-name>   # Load a specific skill');
+    console.log('');
+    console.log('Skill naming:');
+    console.log('  Superpowerwithcodex skills: superpowerwithcodex:skill-name (from ~/.codex/superpowerwithcodex/skills/)');
+    console.log('  Personal skills: skill-name (from ~/.codex/skills/)');
+    console.log('  Personal skills override superpowerwithcodex skills when names match.');
+    console.log('');
+    console.log('Note: All skills are disclosed at session start via bootstrap.');
+}
+
+function runBootstrap() {
+    console.log('# Superpowerwithcodex Bootstrap for Codex');
+    console.log('# ========================================');
+    console.log('');
+
+    if (skillsCore.checkForUpdates(superpowerwithcodexRepoDir)) {
+        console.log('## Update Available');
+        console.log('');
+        console.log('⚠️  Your superpowerwithcodex installation is behind the latest version.');
+        console.log('To update, run: `cd ~/.codex/superpowerwithcodex && git pull`');
+        console.log('');
+        console.log('---');
+        console.log('');
+    }
+
+    if (fs.existsSync(bootstrapFile)) {
+        console.log('## Bootstrap Instructions:');
+        console.log('');
+        try {
+            const content = fs.readFileSync(bootstrapFile, 'utf8');
+            console.log(content);
+        } catch (error) {
+            console.log(`Error reading bootstrap file: ${error.message}`);
+        }
+        console.log('');
+        console.log('---');
+        console.log('');
+    }
+
+    console.log('## Available Skills:');
+    console.log('');
+    runFindSkills();
+
+    console.log('');
+    console.log('---');
+    console.log('');
+
+    console.log('## Auto-loading superpowerwithcodex:using-superpowers skill:');
+    console.log('');
+    runUseSkill('superpowerwithcodex:using-superpowers');
+
+    console.log('');
+    console.log('---');
+    console.log('');
+    console.log('# Bootstrap Complete!');
+    console.log('# You now have access to all superpowerwithcodex skills.');
+    console.log('# Use "superpowerwithcodex-codex use-skill <skill>" to load and apply skills.');
+    console.log('# Remember: If a skill applies to your task, you MUST use it!');
+}
+
+function runUseSkill(skillName) {
+    if (!skillName) {
+        console.log('Usage: superpowerwithcodex-codex use-skill <skill-name>');
+        console.log('Examples:');
+        console.log('  superpowerwithcodex-codex use-skill superpowerwithcodex:brainstorming  # Load superpowerwithcodex skill');
+        console.log('  superpowerwithcodex-codex use-skill brainstorming                       # Load personal skill (or superpowerwithcodex if not found)');
+        console.log('  superpowerwithcodex-codex use-skill my-custom-skill                     # Load personal skill');
+        return;
+    }
+
+    let actualSkillPath;
+    let forceSuperpowerwithcodex = false;
+
+    if (skillName.startsWith('superpowerwithcodex:')) {
+        actualSkillPath = skillName.substring('superpowerwithcodex:'.length);
+        forceSuperpowerwithcodex = true;
+    } else {
+        actualSkillPath = skillName;
+    }
+
+    if (actualSkillPath.startsWith('skills/')) {
+        actualSkillPath = actualSkillPath.substring('skills/'.length);
+    }
+
+    function findSkillFile(searchPath) {
+        const skillMdPath = path.join(searchPath, 'SKILL.md');
+        if (fs.existsSync(skillMdPath)) {
+            return skillMdPath;
+        }
+
+        if (searchPath.endsWith('SKILL.md') && fs.existsSync(searchPath)) {
+            return searchPath;
+        }
+
+        return null;
+    }
+
+    let skillFile = null;
+
+    if (forceSuperpowerwithcodex) {
+        if (fs.existsSync(superpowerwithcodexSkillsDir)) {
+            const superpowerwithcodexPath = path.join(superpowerwithcodexSkillsDir, actualSkillPath);
+            skillFile = findSkillFile(superpowerwithcodexPath);
+        }
+    } else {
+        if (fs.existsSync(personalSkillsDir)) {
+            const personalPath = path.join(personalSkillsDir, actualSkillPath);
+            skillFile = findSkillFile(personalPath);
+            if (skillFile) {
+                console.log(`# Loading personal skill: ${actualSkillPath}`);
+                console.log(`# Source: ${skillFile}`);
+                console.log('');
+            }
+        }
+
+        if (!skillFile && fs.existsSync(superpowerwithcodexSkillsDir)) {
+            const superpowerwithcodexPath = path.join(superpowerwithcodexSkillsDir, actualSkillPath);
+            skillFile = findSkillFile(superpowerwithcodexPath);
+            if (skillFile) {
+                console.log(`# Loading superpowerwithcodex skill: superpowerwithcodex:${actualSkillPath}`);
+                console.log(`# Source: ${skillFile}`);
+                console.log('');
+            }
+        }
+    }
+
+    if (!skillFile) {
+        console.log(`Error: Skill not found: ${actualSkillPath}`);
+        console.log('');
+        console.log('Available skills:');
+        runFindSkills();
+        return;
+    }
+
+    let content, frontmatter;
+    try {
+        const fullContent = fs.readFileSync(skillFile, 'utf8');
+        const { name, description } = skillsCore.extractFrontmatter(skillFile);
+        content = skillsCore.stripFrontmatter(fullContent);
+        frontmatter = { name, description };
+    } catch (error) {
+        console.log(`Error reading skill file: ${error.message}`);
+        return;
+    }
+
+    const displayName = forceSuperpowerwithcodex ? `superpowerwithcodex:${actualSkillPath}` :
+        (skillFile.includes(personalSkillsDir) ? actualSkillPath : `superpowerwithcodex:${actualSkillPath}`);
+
+    const skillDirectory = path.dirname(skillFile);
+
+    console.log(`# ${frontmatter.name || displayName}`);
+    if (frontmatter.description) {
+        console.log(`# ${frontmatter.description}`);
+    }
+    console.log(`# Skill-specific tools and reference files live in ${skillDirectory}`);
+    console.log('# ============================================');
+    console.log('');
+
+    console.log(content);
+}
+
+const command = process.argv[2];
+const arg = process.argv[3];
+
+switch (command) {
+    case 'bootstrap':
+        runBootstrap();
+        break;
+    case 'use-skill':
+        runUseSkill(arg);
+        break;
+    case 'find-skills':
+        runFindSkills();
+        break;
+    default:
+        console.log('Superpowerwithcodex for Codex');
+        console.log('Usage:');
+        console.log('  superpowerwithcodex-codex bootstrap              # Run complete bootstrap with all skills');
+        console.log('  superpowerwithcodex-codex use-skill <skill-name> # Load a specific skill');
+        console.log('  superpowerwithcodex-codex find-skills            # List all available skills');
+        console.log('');
+        console.log('Examples:');
+        console.log('  superpowerwithcodex-codex bootstrap');
+        console.log('  superpowerwithcodex-codex use-skill superpowerwithcodex:brainstorming');
+        console.log('  superpowerwithcodex-codex use-skill my-custom-skill');
+        break;
+}
