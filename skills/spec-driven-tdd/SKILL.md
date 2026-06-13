@@ -59,7 +59,10 @@ For each task:
    - Run test — verify it FAILS before implementing
 2. **Write minimal implementation** to make test pass (GREEN)
 3. **If task involves external calls** — write integration test, verify passes
-4. **Update progress.md**: `[ ]` → `[x]`, add commit hash
+4. **Annotate any compromise** — if you took a coverage shortcut, mocked a path that should be live, or deferred an edge case:
+   - Add a `DEBT:` comment at the code site using the file's native comment syntax (`# DEBT:` Python, `// DEBT:` JS/Java, `-- DEBT:` SQL)
+   - Add an entry under `## Issues` in `progress.md` describing the compromise
+5. **Update progress.md**: `[ ]` → `[x]`, add commit hash
 
 ### Step 4: Re-entry (progress.md exists)
 
@@ -91,5 +94,6 @@ All three pass your implementation's own tests. All three fail against the spec.
 - Writing tests without first reading GIVEN/WHEN/THEN
 - Implementing then testing
 - Skipping progress.md
+- Making a compromise (coverage shortcut, mocked path, deferred edge case) without a `DEBT:` annotation at the code site and an Issues entry in progress.md
 
 **All of these mean: read the specs first.**

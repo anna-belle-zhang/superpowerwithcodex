@@ -99,16 +99,18 @@ Check for contradictions:
 
 ### Step 4a: Collect Manual Debt Annotations
 
-Scan the codebase for `// DEBT:` comments after verification passes:
+Scan the codebase for `DEBT:` comments in every comment syntax after verification passes:
 
 ```bash
-rg -n "// DEBT:" src tests . 2>/dev/null
+rg -n "DEBT:" src tests . 2>/dev/null
 ```
+
+Supported comment syntaxes: `#` (Python), `//` (JS/Java), `--` (SQL), `<!--` (HTML/XML).
 
 Collect each result with:
 - file path
 - line number
-- reason text after `// DEBT:`
+- reason text after `DEBT:`
 
 If no manual annotations exist, continue. This alone is not a failure.
 
@@ -124,10 +126,18 @@ If `docs/specs/_living/` does not exist:
 - Log a warning
 - Continue gracefully (feature may not modify existing behavior)
 
-If there are no `REMOVED` sections and no `// DEBT:` comments:
+### Step 4b-2: Collect Debt From progress.md Issues
+
+Read `docs/specs/<feature>/progress.md` and inspect its `## Issues` section:
+
+1. For each entry that describes a coverage compromise or deferred work (e.g., "mocked X that should be live", "deferred edge case Y"), collect it as a debt candidate with source noted as `progress.md Issues`
+2. Entries that merely narrate an event (e.g., "renamed X to Y") with no future work implied are **not** debt candidates — skip them
+3. If `progress.md` is missing or its `## Issues` section is empty, continue without failure
+
+If there are no `REMOVED` sections, no `DEBT:` comments in any comment syntax, and no debt-bearing `progress.md` Issues entries:
 - Skip Step 4c through Step 4e
 - Report that Step 4 was skipped because no technical debt was found
-- Continue to `superpowers:archiving-specs`
+- Continue to `superpowerwithcodex:archiving-specs`
 
 ### Step 4c: Write Feature-Level `technical-debt.md`
 
@@ -178,9 +188,8 @@ If debt items were found, report the count and prompt:
 Found N debt items. Run cleanup-and-refactor now? (yes/no)
 ```
 
-- If yes: invoke `superpowers:cleanup-and-refactor`
-- If no: continue to `superpowers:archiving-specs` with debt tracked for later
-- If no: continue to `archive-specs` after verification
+- If yes: invoke `superpowerwithcodex:cleanup-and-refactor`
+- If no: continue to `superpowerwithcodex:archiving-specs` with debt tracked for later
 
 ### Step 5: Final Verdict
 
@@ -207,6 +216,7 @@ If Step 4 created debt items, append a short debt summary:
 
 - Manual debt annotations found: N
 - Scenario-driven debt items found: M
+- progress.md Issues debt items found: K
 - Tracker updated: docs/specs/_technical-debt.md
 - Feature debt file: docs/specs/<feature>/technical-debt.md
 ```
@@ -231,8 +241,8 @@ If Step 4 created debt items, append a short debt summary:
 ## Integration
 
 **Called by:**
-- `superpowers:finishing-a-development-branch` — Step 1b before merge options
-- `superpowers:ralph-codex-e2e` — post-loop before cleanup
+- `superpowerwithcodex:finishing-a-development-branch` — Step 1b before merge options
+- `superpowerwithcodex:ralph-codex-e2e` — post-loop before cleanup
 
 **Requires:**
 - Delta specs in `docs/specs/<feature>/specs/`
@@ -244,5 +254,5 @@ If Step 4 created debt items, append a short debt summary:
 - `docs/specs/_technical-debt.md` when debt is found
 
 **Followed by:**
-- `superpowers:cleanup-and-refactor` — when the user chooses yes at Step 4e
-- `superpowers:archiving-specs` — after verification passes when cleanup is skipped or complete
+- `superpowerwithcodex:cleanup-and-refactor` — when the user chooses yes at Step 4e
+- `superpowerwithcodex:archiving-specs` — after verification passes when cleanup is skipped or complete

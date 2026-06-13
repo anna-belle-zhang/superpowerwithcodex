@@ -17,12 +17,13 @@ Post-completion merge flow:
 1. ADDED scenarios → append to living spec
 2. MODIFIED scenarios → replace in living spec
 3. REMOVED scenarios → delete from living spec + record in change history
-4. Move feature directory to archive
-5. Commit
+4. Update system index (`docs/specs/_living/ARCHITECTURE.md`)
+5. Move feature directory to archive
+6. Commit
 
 ## Prerequisites
 
-- `superpowers:verifying-specs` must have passed (all checks PASS)
+- `superpowerwithcodex:verifying-specs` must have passed (all checks PASS)
 - If verification hasn't been run, run it first. Do not archive unverified specs.
 
 ## The Process
@@ -86,6 +87,27 @@ THEN [new expected result]
 
 - YYYY-MM-DD: Removed "<Behavior Name>" via <feature> (reason: [reason from delta])
 ```
+
+### Step 2.5: Update System Index
+
+After processing all delta specs, update `docs/specs/_living/ARCHITECTURE.md`:
+
+1. If `docs/specs/_living/ARCHITECTURE.md` does not exist:
+   - Skip this step without failure
+   - If three or more living specs now exist, offer to create `ARCHITECTURE.md` once
+2. For each living spec created or updated in Step 2:
+   - Add or update an entry with: component name, a markdown link to the file, and a 1–3 line behavior summary
+   - Update the index header's "as of" date to today
+3. **Index verification check:** Scan `docs/specs/_living/` for any `.md` file (excluding `ARCHITECTURE.md`) that `ARCHITECTURE.md` does not reference — report each unindexed file as not indexed
+
+### Step 2.6: Pre-Archive Completeness Check
+
+Before moving the feature directory, verify it is complete:
+
+1. **progress.md** — if the feature directory has no `progress.md`, STOP and ask whether to backfill a stub or proceed with a noted gap
+2. **proposal.md / design.md** — if either is missing, issue a warning and continue (not blocking)
+3. **Stray spec files** — if any `*.md` file sits at the feature root instead of inside `specs/`, move it into `specs/` before archiving
+4. **Junk files** — if the feature directory contains junk files (`* copy.*` or editor backups), delete them before archiving
 
 ### Step 3: Archive Feature Directory
 
@@ -155,11 +177,11 @@ THEN ...
 ## Integration
 
 **Called by:**
-- `superpowers:finishing-a-development-branch` — after merge/PR
-- `superpowers:ralph-codex-e2e` — post-loop after verification
+- `superpowerwithcodex:finishing-a-development-branch` — after merge/PR
+- `superpowerwithcodex:ralph-codex-e2e` — post-loop after verification
 
 **Requires:**
-- Verified specs (`superpowers:verifying-specs` passed)
+- Verified specs (`superpowerwithcodex:verifying-specs` passed)
 - Delta specs in `docs/specs/<feature>/specs/`
 
 **Produces:**

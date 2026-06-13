@@ -75,7 +75,7 @@ class TestVerifyingSpecsDebtFlow:
         content = _read_skill("verifying-specs")
         assert "Run cleanup-and-refactor now? (yes/no)" in content
         assert "cleanup-and-refactor" in content
-        assert "archive-specs" in content
+        assert "archiving-specs" in content
 
     def test_verifying_specs_handles_no_debt_and_missing_living_specs(self):
         content = _read_skill("verifying-specs")
