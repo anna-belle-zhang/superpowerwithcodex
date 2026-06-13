@@ -8,11 +8,34 @@ don't ask permission for low risk actions
 
 Superpowers is a complete software development workflow system for coding agents, built on composable "skills" that enforce systematic processes. It transforms how agents approach development by requiring design before code, comprehensive planning before implementation, and test-driven development throughout.
 
+This repository is a **fork of [obra/superpowers](https://github.com/obra/superpowers)** that adds Codex integration: Claude writes specs and E2E tests, Codex implements code and writes unit/integration tests.
+
 **Core Philosophy:**
 - Test-Driven Development (write tests first, always)
 - Systematic over ad-hoc (process over guessing)
 - Complexity reduction (simplicity as primary goal)
 - Evidence over claims (verify before declaring success)
+
+## Running Tests
+
+**Python tests** (pytest configured via `pytest.ini`, testpaths = `tests/`):
+```bash
+pytest                                          # All Python tests
+pytest tests/structured-specs-integration/     # One suite
+pytest tests/structured-specs-integration/test_commands.py::test_name  # Single test
+```
+
+The `tests/structured-specs-integration/` suite validates this repo's own conventions — skill files, command files, CLAUDE.md content, spec directory structure. Run it after editing skills, commands, or this file.
+
+**Shell-based suites:**
+```bash
+bash tests/opencode/run-tests.sh               # OpenCode plugin tests (--integration for full run)
+bash tests/e2e/ralph-codex-e2e/run-tests.sh    # E2E scenarios (requires codex CLI + ~/.codex/config.toml)
+```
+
+**JS tests** (`tests/lib/*.test.js`): Jest ESM tests for `lib/codex-integration.js` and `lib/ralph-orchestrator.js`. There is no root `package.json`; jest must be available and run with `NODE_OPTIONS=--experimental-vm-modules` (they use `jest.unstable_mockModule`).
+
+Note: `src/` and the top-level test files (`tests/test_jwt_auth.py`, etc.) are sample code produced by spec-driven workflow runs, not the plugin itself.
 
 ## Architecture
 
@@ -43,7 +66,7 @@ skills/
 **Configuration:**
 - `.claude-plugin/plugin.json` - Plugin metadata
 - `.claude-plugin/marketplace.json` - Marketplace configuration
-- `hooks/hooks.json` - Session start hooks
+- `hooks/hooks.json` - SessionStart hook (injects using-superpowers skill) and UserPromptSubmit hook (injects mandatory workflow rules every turn)
 
 **Commands:**
 - `/superpowerwithcodex:brainstorm` - Interactive design refinement
@@ -54,25 +77,37 @@ skills/
 - `/superpowerwithcodex:archive-specs` - Archive delta specs into living specifications
 - `/superpowerwithcodex:search` - Search remote marketplace catalog for skills by keyword
 
+### Codex Integration Layer
+
+Two JS modules in `lib/` implement the Claude↔Codex orchestration:
+
+- `lib/codex-integration.js` - Codex availability checks, MCP config loading (`.mcp.json`), task dispatch (`executeWithCodex`), retry with feedback, and E2E strategy detection (`detectE2EStrategy` sniffs for Playwright/Cypress/etc.)
+- `lib/ralph-orchestrator.js` - Ralph-Codex-E2E loop: Codex handles implementation + unit + integration tests, Claude runs E2E tests, loop until green
+
+Codex runs sandboxed; implementation tasks require `workspace-write` mode and `network_access = true` in `~/.codex/config.toml` (see README "Codex Permissions").
+
 ### Directory Structure
 
 - `skills/` - All skill definitions (flat namespace)
 - `commands/` - Slash command definitions
 - `agents/` - Agent definitions (e.g., code-reviewer)
-- `lib/` - Core utilities
+- `lib/` - Core utilities (skills-core.js, codex-integration.js, ralph-orchestrator.js)
 - `hooks/` - Lifecycle hooks
-- `docs/` - Documentation and design plans
-- `tests/` - Test files
+- `docs/plans/` - Design docs (`YYYY-MM-DD-<topic>-design.md`)
+- `docs/specs/` - Structured specs (see Structured Specifications below)
+- `tests/` - Python, JS, and shell test suites
+- `repos/` - Vendored reference repositories (not part of the plugin)
+- `src/` - Sample output from spec-driven workflow runs (not plugin code)
 
 ## Development Workflow
 
 ### The Superpowers Cycle
 
-1. **brainstorming** - Before writing code, refine ideas through questions, explore alternatives, present design in sections. Saves to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+1. **brainstorming** - Before writing code, refine ideas through questions, explore alternatives, present design in sections. After understanding the purpose, dispatch a research subagent (Codex by default) to survey best practices and available repos — research is low-risk, no permission needed. Saves to `docs/plans/YYYY-MM-DD-<topic>-design.md`
 
 2. **writing-specs** *(optional)* - Transform brainstorm output into structured specs with GIVEN/WHEN/THEN scenarios. Creates `docs/specs/<feature>/` with proposal, design, and delta specs
 
-3. **using-git-worktrees** - After design approval, create isolated workspace on new branch, verify clean test baseline
+3. **using-git-worktrees** - After design approval, ask user permist to create isolated workspace on new branch, verify clean test baseline
 
 4. **writing-plans** - Break work into 2-5 minute tasks with exact file paths, complete code, verification steps. When specs exist, tasks include scenario tables
 
@@ -89,6 +124,26 @@ skills/
 10. **archiving-specs** *(when specs exist)* - Merge delta specs into living specs, archive feature directory
 
 **CRITICAL: These workflows are mandatory, not suggestions. Skills are enforced processes.**
+
+### Codex Workflows (this fork)
+
+**Specs-first (recommended)** — `claude-codex-specs-tdd` + `spec-driven-tdd`:
+Claude writes GIVEN/WHEN/THEN specs, dispatches Codex with only the spec path. Codex derives its own plan and tests, implements, and writes `progress.md` into the spec folder for re-entry. Claude runs E2E tests and verifies specs after Codex returns. In this workflow **Claude never writes unit/integration tests** — Codex derives them from the specs.
+
+Dispatch format:
+```
+Use superpowerwithcodex:spec-driven-tdd
+Spec directory: docs/specs/<feature>/
+Implement in: src/
+Tests in: tests/
+Test command: <test command>
+```
+
+**Tests-first** — `codex-subagent-driven-development`: Claude writes tests (RED), Codex implements (GREEN), Claude reviews (REFACTOR), with file-boundary protection and a retry chain.
+
+**Ralph loop** — `ralph-codex-e2e`: Codex handles dev + unit + integration tests, Claude handles E2E, loops until all green.
+
+**One-off tasks** — `codex-cli` skill dispatches via the `codex:codex-rescue` subagent.
 
 ## Working with Skills
 
@@ -248,6 +303,10 @@ Was: [what] → Reason: [why]
 ## Important Files
 
 - `lib/skills-core.js` - Core skill discovery and resolution logic
+- `lib/codex-integration.js` - Codex dispatch, retry, and E2E strategy detection
+- `lib/ralph-orchestrator.js` - Ralph-Codex-E2E loop orchestration
+- `skills/claude-codex-specs-tdd/SKILL.md` - Specs-first dispatch workflow (Claude side)
+- `skills/spec-driven-tdd/SKILL.md` - Spec-driven implementation (Codex side)
 - `skills/writing-skills/SKILL.md` - Complete skill authoring guide
 - `skills/test-driven-development/SKILL.md` - TDD methodology and enforcement
 - `skills/brainstorming/SKILL.md` - Design refinement process
