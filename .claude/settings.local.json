@@ -81,7 +81,9 @@
       "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/hooks.json /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/hooks.json)",
       "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/run-hook.cmd /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/run-hook.cmd)",
       "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/session-start.sh /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/session-start.sh)",
-      "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/prompt-submit.sh /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/prompt-submit.sh)"
+      "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/prompt-submit.sh /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/prompt-submit.sh)",
+      "WebFetch(domain:jessezam.medium.com)",
+      "WebFetch(domain:alphaguruai.substack.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

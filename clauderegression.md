@@ -156,3 +156,50 @@ The bigger problem: Claude 4.6 + Claude Code regression (~March 16-17)
   ▎ Rules should not be used to enforce behavior that needs to be         
   absolute. Hooks are mechanically executed and don't depend on LLM       
   judgment.
+
+
+ I analyzed clauderegression.md and ran a subagent that verified every claim against
+  livecsources.tThenheadline:athe note's facts all check out, but it's now badly outdated — 
+  Anthropic published an official post-mortem on April 23, 2026 acknowledging and fixing the 
+  regression, with a different root cause than the note hypothesized.o select · Enter to view
+  What the note got right
+
+  - Every GitHub reference is genuine — nothing fabricated. Issues #36093  (https://github.com/anthropics/claude-code/issues/36093), #40489
+  (https://github.com/anthropics/claude-code/issues/40489), #31480  (https://github.com/anthropics/claude-code/issues/31480), #28469
+  (https://github.com/anthropics/claude-code/issues/28469), #18660
+  (https://github.com/anthropics/claude-code/issues/18660) all exist with the described
+  content, and zero Anthropic staff ever commented on any of them (all closures were by the
+  stale bot).
+  - The regression itself was real. Users complaining in the March window were vindicated.
+  - The hooks workaround is sound. The "hooks are guarantees, CLAUDE.md is guidance"
+  principle is genuine community consensus, and the UserPromptSubmit re-injection trick was  indeed posted on #36093/#40489. (This repo's own hooks/hooks.json already implements it.)
+  - All three cited blog posts exist and say roughly what the note claims. The 1M-context GA  is real and correctly dated (March 13, 2026).
+
+  What's now stale or contradicted
+  1. "Server-side inference optimization, no acknowledgment, no fix" — superseded.  Anthropic's April 23 post-mortem
+  (https://www.anthropic.com/engineering/april-23-postmortem) attributed everything to three  client/harness-layer changes, and explicitly cleared the inference layer:
+    - March 4: default reasoning effort silently dropped from high to medium — reverted April
+  7    - March 26: caching bug cleared thinking/session state every turn — fixed April 10 in
+  v2.1.101    - April 16: anti-verbosity system-prompt change hurt coding quality — reverted April 20
+  in v2.1.116
+
+  They also reset subscriber usage limits as a goodwill gesture. So the note's central  "server-side, tied to 1M GA" hypothesis was contradicted, and the "silently swapped to 4.5"
+  theory in #31480 remains pure speculation.  2. The upstream superpowers fixes are no longer "stuck." obra/superpowers issues #999/#940
+  were closed as completed on April 27 — the finishing-a-development-branch skill got a full  detect-and-defer rewrite via PR #1121, shipped in superpowers v5.1.0 (May 4). PRs
+  #391/#913/#952 were closed unmerged as superseded. Cherry-picking them, as the note  suggests, would now be the wrong move — pulling the v5.1.0 rewrite from upstream is the
+  right one.
+  3. The "thinking triggers are cosmetic" claim is dated — ultrathink was restored in Claude
+  Code v2.1.68 (maps to high effort for the turn).  4. One nuance worth keeping: #18660 and #28469 predate the March regression, so "skills
+  read but not followed" is really two layered problems — a chronic LLM instruction-adherence  limitation (still true, hooks still the right mitigation) underneath an acute regression
+  that has since been fixed.
+
+  Bottom line
+
+  The note was accurate journalism for late March but its conclusions ("no fix possible, no  acknowledgment, work around a broken model") no longer hold. The acute regression is fixed
+  (be on Claude Code ≥ v2.1.116; current is v2.1.173), the upstream skill bugs are fixed in
+  superpowers v5.1.0, and the durable takeaway that survives is the architecture lesson:
+  enforce critical rules via hooks, advisory guidance via CLAUDE.md/skills — which this fork
+  already does.
+
+  If you want, I can update clauderegression.md with a dated addendum reflecting all of this,  and/or look at syncing the upstream v5.1.0 finishing-a-development-branch rewrite into
+  this fork.
