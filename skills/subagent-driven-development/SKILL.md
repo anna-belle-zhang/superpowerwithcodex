@@ -33,6 +33,21 @@ Execute plan by dispatching fresh subagent per task, with code review after each
 
 Read plan file, create TodoWrite with all tasks.
 
+**Check for existing progress ledger** at `.superpowers/sdd/progress.md`:
+- If it exists, read it to find which tasks are already complete (by commit hash)
+- Skip completed tasks in TodoWrite and resume from the first incomplete task
+- Announce: "Resuming from Task N — Tasks 1–N-1 already complete per progress ledger"
+
+If no ledger exists, create `.superpowers/sdd/progress.md`:
+```markdown
+# SDD Progress Ledger
+Plan: [plan-file]
+Started: [ISO timestamp]
+
+## Completed Tasks
+<!-- updated after each task -->
+```
+
 ### 2. Execute Task with Subagent
 
 For each task:
@@ -60,6 +75,14 @@ Task tool (general-purpose):
 
 ### 3. Review Subagent's Work
 
+**Single reviewer covers BOTH spec compliance AND code quality** — never split these into separate passes.
+
+Get SHAs before dispatching:
+```bash
+BASE_SHA=[commit before task started]
+HEAD_SHA=$(git rev-parse HEAD)
+```
+
 **Dispatch code-reviewer subagent:**
 ```
 Task tool (superpowers:code-reviewer):
@@ -72,7 +95,12 @@ Task tool (superpowers:code-reviewer):
   DESCRIPTION: [task summary]
 ```
 
-**Code reviewer returns:** Strengths, Issues (Critical/Important/Minor), Assessment
+**Critical constraints:**
+- Never accept a review report missing either a spec-compliance verdict OR a code-quality verdict
+- Never tell the reviewer what not to flag or pre-judge severity before they review
+- Reviewer receives diff via BASE_SHA/HEAD_SHA — never paste code text instead
+
+**Code reviewer returns:** Strengths, Issues (Critical/Important/Minor), Assessment (spec + quality)
 
 ### 4. Apply Review Feedback
 
@@ -89,6 +117,10 @@ Task tool (superpowers:code-reviewer):
 ### 5. Mark Complete, Next Task
 
 - Mark task as completed in TodoWrite
+- **Update progress ledger** — append to `.superpowers/sdd/progress.md`:
+  ```
+  - Task N: [task name] — commit [HEAD_SHA] — [ISO timestamp]
+  ```
 - Move to next task
 - Repeat steps 2-5
 
@@ -165,13 +197,20 @@ Done!
 
 **Never:**
 - Skip code review between tasks
+- Accept a review report missing spec-compliance OR code-quality verdict
+- Tell reviewers what not to flag or pre-judge severity
 - Proceed with unfixed Critical issues
 - Dispatch multiple implementation subagents in parallel (conflicts)
 - Implement without reading plan task
+- Paste code into reviewer prompts — always use BASE_SHA/HEAD_SHA diff
 
 **If subagent fails task:**
 - Dispatch fix subagent with specific instructions
 - Don't try to fix manually (context pollution)
+
+**If session resets mid-plan:**
+- Read `.superpowers/sdd/progress.md` to find last completed commit
+- Resume from next incomplete task — don't redo completed work
 
 ## Integration
 
