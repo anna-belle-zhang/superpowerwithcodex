@@ -1,5 +1,7 @@
 .worktrees/
+.superpowers/
 .private-journal/
+node_modules/
 .claude/settings.local.json
 tests/e2e/**/node_modules/
 tests/e2e/**/package-lock.json
