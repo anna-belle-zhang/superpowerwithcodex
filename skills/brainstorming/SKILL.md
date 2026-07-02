@@ -15,6 +15,7 @@ Start by understanding the current project context, then ask questions one at a 
 
 **Understanding the idea:**
 - Check out the current project state first (files, docs, recent commits)
+- If upcoming questions will involve visual content, offer the visual companion once before asking detailed clarifying questions. The offer must be its own message. See the Visual Companion section below.
 - Ask questions one at a time to refine the idea
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
@@ -64,3 +65,28 @@ Start by understanding the current project context, then ask questions one at a 
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Incremental validation** - Present design in sections, validate each
 - **Be flexible** - Go back and clarify when something doesn't make sense
+
+## Visual Companion
+
+A browser-based companion can show mockups, diagrams, and visual options during
+brainstorming. It is a tool for visual questions, not a mode for the whole session.
+
+**Offering the companion:** When upcoming questions will involve visual content
+(mockups, layouts, diagrams, or side-by-side visual comparisons), offer it once:
+
+> Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. This feature is still new and can be token-intensive. Want to try it? (Requires opening a local URL)
+
+This offer must be its own message. Do not combine it with clarifying questions,
+context summaries, or any other content. Wait for the user's response before
+continuing. If they decline, proceed with text-only brainstorming.
+
+**Per-question decision:** Even after the user accepts, decide for each question
+whether to use the browser or the terminal. Use the browser when seeing the
+content is clearer than reading it: UI mockups, architecture diagrams,
+side-by-side layouts, visual hierarchy, or spatial relationships. Use the
+terminal for requirements, scope, conceptual choices, tradeoffs, and technical
+decisions.
+
+If they accept the companion, read `skills/brainstorming/visual-companion.md`
+before using browser screens. Follow its server lifecycle, file naming, event
+reading, and stale-screen cleanup guidance.
