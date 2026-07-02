@@ -24,6 +24,16 @@ Technical debt follow-up:
 
 ## The Process
 
+### Step 0: Schema Validation
+
+Run the deterministic validator before any LLM check:
+
+```bash
+python scripts/validate_specs.py docs/specs/<feature>/
+```
+
+Structural defects (missing sections, incomplete GIVEN/WHEN/THEN, missing Was/Now/Reason fields) must be fixed before Steps 2-4 — the LLM checks assume structurally valid specs. (If the script does not exist in this checkout, note that and continue.)
+
 ### Step 1: Locate Specs
 
 - Find the feature specs directory: `docs/specs/<feature>/`

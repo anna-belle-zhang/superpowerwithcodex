@@ -136,8 +136,15 @@ THEN [new expected result]
 - No implementation details in scenarios (test the what, not the how)
 - Each scenario must be independently verifiable
 
-### Step 6: Review and Commit
+### Step 6: Validate, Review and Commit
 
+- Run the schema validator and fix every reported defect before review:
+
+```bash
+python scripts/validate_specs.py docs/specs/<feature>/
+```
+
+  (If the script does not exist in this checkout, note that and continue.)
 - Present the specs to the user section by section (like brainstorming)
 - Ask after each delta spec: "Does this capture the behavior correctly?"
 - Once approved:

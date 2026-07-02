@@ -49,14 +49,24 @@ Claude is architect and validator. Codex is planner and implementer. Specs are t
 ### Mid-Cycle Re-entry (specs already exist)
 
 1. Read `docs/specs/<feature>/progress.md` — understand what Codex completed
-2. Diagnose: E2E failure? Spec gap? Bug?
-3. Choose:
+2. **Check staleness**: recompute `sha256sum proposal.md design.md specs/*-delta.md` (from the feature dir) and compare with progress.md's `## Spec Fingerprint` section
+   - Mismatch or missing section → specs changed after Codex's last run. Tell the user which files changed; Codex will reopen affected `[x]` tasks on re-entry (per spec-driven-tdd). Never present `[x]` tasks from a stale fingerprint as verified work.
+3. Diagnose: E2E failure? Spec gap? Bug?
+4. Choose:
    - **Fix**: re-dispatch Codex with failure + spec path
    - **Spec change**: update affected scenarios, re-dispatch Codex
 
 When specs change: Codex re-runs only affected tasks, not the full plan.
 
 ## Dispatch Format
+
+**Gate: validate specs before every dispatch (fresh or re-entry):**
+
+```bash
+python scripts/validate_specs.py docs/specs/<feature>/
+```
+
+Non-zero exit → fix the reported spec defects first. Never dispatch Codex on specs that fail validation — a malformed contract wastes an entire Codex cycle. (If the script does not exist in this checkout, note that and proceed.)
 
 ```
 Use superpowerwithcodex:spec-driven-tdd
