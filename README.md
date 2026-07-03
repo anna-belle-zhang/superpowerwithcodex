@@ -15,7 +15,7 @@ Superpowers is a complete software development workflow for your coding agents, 
 
 ## 🆕 What's New: Four Integration Patterns
 
-This fork adds **three powerful integration patterns** following the thin skill + thick executor architecture:
+This fork adds **four integration patterns** following the thin skill + thick executor architecture:
 
 ### 1. **Specs-First Workflow** (`claude-codex-specs-tdd` + `spec-driven-tdd`)
 
@@ -45,6 +45,28 @@ brainstorm → write-specs → dispatch Codex → Codex: reads specs, writes pla
 - ✅ **Clean Git History**: Separate commits for tests and implementation
 
 📖 [Complete Guide](docs/quickstart-codex-subagent-workflow.md)
+
+### 3. **Cross-Session Handover** (`handover-manager`)
+
+Coarse-grained handover snapshots so another session or tool (Claude CLI ↔ Cowork ↔ Codex) can resume work without chat history.
+
+- ✅ **Standard format**: decisions, changes, file list (from `git diff --stat`, never memory), verification results, open items, copy-pasteable restart instructions
+- ✅ **Storage**: `docs/handovers/YYYY-MM-DD-HHmm-<topic>.md`, latest indexed at `docs/handovers/LATEST.md`
+- ✅ **PreCompact hook**: when context nears compaction, a hook reminds Claude to write the handover first
+- ✅ **Wired into wrap-up**: `finishing-a-development-branch` includes a handover step
+- ✅ **Iron rules**: never embellish progress; unverified file list → run `git diff`
+
+Part of the flow-layer design ([docs/plans/2026-07-03-flow-layer-design.md](docs/plans/2026-07-03-flow-layer-design.md)). Two sibling skills are designed but not yet implemented: `sdd-router` (risk/complexity tiering → FULL spec workflow vs LIGHT mini-spec) and `learn` (lesson → pattern → skill-upgrade proposal).
+
+### 4. **Technical Debt Pipeline** (`verifying-specs` → `cleanup-and-refactor`)
+
+Debt is annotated at creation time and collected from three sources during spec verification:
+
+- ✅ **Codex annotates compromises**: `spec-driven-tdd` requires a `DEBT:` comment (in the file's native comment syntax) plus a progress.md `## Issues` entry for every coverage shortcut
+- ✅ **Language-aware scan**: `verifying-specs` matches `# DEBT:`, `// DEBT:`, `-- DEBT:`, `<!-- DEBT:` — not just C-style comments
+- ✅ **Three debt sources**: DEBT annotations, progress.md Issues entries, and behaviors replaced by REMOVED deltas
+- ✅ **System index maintenance**: `archiving-specs` keeps `docs/specs/_living/ARCHITECTURE.md` in sync with living specs
+- ✅ **Pre-archive completeness check**: no blind `mv` — verifies progress.md exists, files are in place, junk is removed
 
 ## Installation
 
@@ -176,7 +198,7 @@ brainstorm → write-specs → worktree → write-plan → execute → verify-sp
    - **Completeness:** every GIVEN/WHEN/THEN scenario has a passing test
    - **Correctness:** each test's setup/action/assertion matches its scenario
    - **Coherence:** no contradictions between delta specs or living specs
-   - **Technical Debt:** collects `// DEBT:` annotations + scenario-driven debt (REMOVED behaviors)
+   - **Technical Debt:** collects `DEBT:` annotations (any comment syntax), progress.md Issues entries, and scenario-driven debt (REMOVED behaviors)
    - Creates `technical-debt.md` + updates `_technical-debt.md` tracker
    - Prompts: "Run cleanup-and-refactor now? (yes/no)"
    - Blocks merge on verification failure — no exceptions
@@ -193,10 +215,13 @@ brainstorm → write-specs → worktree → write-plan → execute → verify-sp
 
 8. **Finish branch** — `/superpowerwithcodex:finishing-a-development-branch`
    - Presents merge / PR / keep / discard options
+   - Writes a handover snapshot (`handover-manager`) as part of wrap-up
    - Automatically runs archive-specs after merge
 
 9. **Archive specs** — `/superpowerwithcodex:archive-specs`
    - Merges delta specs into `docs/specs/_living/` (source of truth)
+   - Updates the system index (`docs/specs/_living/ARCHITECTURE.md`)
+   - Runs a pre-archive completeness check (progress.md present, no stray/junk files)
    - Moves feature dir to `docs/specs/_archive/YYYY-MM-DD-<feature>/`
 
 **Structured specs are opt-in.** The brainstorming skill asks after design approval. If you skip specs, steps 2, 6, and 8 are omitted and the workflow is: brainstorm → worktree → write-plan → execute → finish.
@@ -245,7 +270,8 @@ User: /superpowerwithcodex:claude-codex-specs-tdd
 - **requesting-code-review** - Pre-review checklist
 - **receiving-code-review** - Responding to feedback
 - **using-git-worktrees** - Parallel development branches
-- **finishing-a-development-branch** - Merge/PR decision workflow
+- **finishing-a-development-branch** - Merge/PR decision workflow (includes handover step)
+- **handover-manager** - Cross-session/cross-tool handover snapshots (with PreCompact hook)
 - **subagent-driven-development** - Fast iteration with quality gates
 
 **External Tool Integration**

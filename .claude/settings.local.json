@@ -83,7 +83,12 @@
       "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/session-start.sh /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/session-start.sh)",
       "Bash(cp /mnt/e/A/superpowerwithcodex/hooks/prompt-submit.sh /root/.claude/plugins/cache/superpowerwithcodex/superpowerwithcodex/4.0.2/hooks/prompt-submit.sh)",
       "WebFetch(domain:jessezam.medium.com)",
-      "WebFetch(domain:alphaguruai.substack.com)"
+      "WebFetch(domain:alphaguruai.substack.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(gh ssh-key *)",
+      "Bash(ssh-keygen *)",
+      "Bash(ssh -T git@github.com)",
+      "Bash(echo \"debt-scan-exit:$?\")"
     ]
   },
   "enableAllProjectMcpServers": true,
