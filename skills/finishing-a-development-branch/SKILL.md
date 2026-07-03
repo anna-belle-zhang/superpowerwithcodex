@@ -9,7 +9,7 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 Guide completion of development work by presenting clear options and handling chosen workflow.
 
-**Core principle:** Verify tests → Present options → Execute choice → Clean up.
+**Core principle:** Verify tests → Write handover → Present options → Execute choice → Clean up.
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
@@ -43,10 +43,16 @@ Stop. Don't proceed to Step 2.
 - If yes:
   - **REQUIRED SUB-SKILL:** Use `superpowers:verify-specs`
   - If verification **fails:** STOP. Fix missing or incorrect coverage before proceeding.
-  - If verification **passes:** Continue to Step 2.
-- If no specs directory exists: Skip to Step 2.
+  - If verification **passes:** Continue to Step 1c.
+- If no specs directory exists: Skip to Step 1c.
 
 **After merge/PR (Step 4):** If specs were verified, use `superpowers:archive-specs` to merge deltas into living specs and archive the feature directory.
+
+### Step 1c: Write Done Handover
+
+Before presenting merge/PR/cleanup options, use `handover-manager` to write a handover document for the completed branch.
+
+Set the handover status to `done`. Include the verification command that passed, the git-verified file list, any relevant spec or workflow ledger paths, and restart instructions for the chosen integration path.
 
 ### Step 2: Determine Base Branch
 
