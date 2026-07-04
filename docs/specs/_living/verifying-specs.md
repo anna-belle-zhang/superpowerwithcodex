@@ -61,3 +61,17 @@ WHEN verify-specs runs Step 4b (scenario-driven analysis)
 THEN a warning is logged but execution continues (feature may not modify existing behavior)
 
 *Added: 2026-03-12 via technical-debt-cleanup*
+
+### Verify Reads Scenarios From Mini-Specs Too
+GIVEN a LIGHT feature directory with mini.md and an implementation with tests
+WHEN verify-specs runs
+THEN it produces the same scenario→test coverage table (COVERED/MISSING per scenario) sourced from mini.md scenarios
+
+*Modified: 2026-07-04 via sdd-router-light (was: verify-specs read scenarios only from specs/*-delta.md)*
+
+### Coherence Check Includes Mini-Specs
+GIVEN a mini.md scenario that contradicts a behavior in `docs/specs/_living/`
+WHEN verify-specs runs its coherence check
+THEN the contradiction is reported as a failure, the same as it would be for a delta spec
+
+*Modified: 2026-07-04 via sdd-router-light (was: coherence check compared only delta specs against each other and _living/)*
