@@ -56,7 +56,10 @@ Coarse-grained handover snapshots so another session or tool (Claude CLI ↔ Cow
 - ✅ **Wired into wrap-up**: `finishing-a-development-branch` includes a handover step
 - ✅ **Iron rules**: never embellish progress; unverified file list → run `git diff`
 
-Part of the flow-layer design ([docs/plans/2026-07-03-flow-layer-design.md](docs/plans/2026-07-03-flow-layer-design.md)). Two sibling skills are designed but not yet implemented: `sdd-router` (risk/complexity tiering → FULL spec workflow vs LIGHT mini-spec) and `learn` (lesson → pattern → skill-upgrade proposal).
+Part of the flow-layer design ([docs/plans/2026-07-03-flow-layer-design.md](docs/plans/2026-07-03-flow-layer-design.md)), now fully implemented alongside two sibling skills:
+
+- **`sdd-router`** (`/superpowerwithcodex:sdd-router`) — routes feature work to the FULL spec workflow or a LIGHT mini-spec by risk, complexity, and user confirmation
+- **`learn`** — lesson → pattern → skill-upgrade proposal capture. Confirmed entries go to `docs/lessons.md` (validated by `scripts/validate_lessons.py`), dedup by tag, promotion to `~/.claude/lessons-common.md` at 2 occurrences, upgrade proposal at 3. The handover wrap-up chains into learn's passive scan; nothing is ever written without explicit user confirmation
 
 ### 4. **Technical Debt Pipeline** (`verifying-specs` → `cleanup-and-refactor`)
 
@@ -105,6 +108,7 @@ Check that commands appear:
 # /superpowerwithcodex:verify-specs - Verify spec scenarios have tests
 # /superpowerwithcodex:archive-specs - Archive delta specs into living specs
 # /superpowerwithcodex:cleanup-and-refactor - Clean tracked technical debt in isolated worktree
+# /superpowerwithcodex:sdd-router  - Route feature work to FULL specs or LIGHT mini-specs
 ```
 
 ### Codex
@@ -261,6 +265,8 @@ User: /superpowerwithcodex:claude-codex-specs-tdd
 
 **Collaboration**
 - **brainstorming** - Socratic design refinement
+- **brainstormlight** - Rapid-fire "grill me" questioning with a crash-safe decision ledger
+- **sdd-router** - Route feature work to FULL specs or LIGHT mini-specs by risk/complexity
 - **writing-specs** - Structured GIVEN/WHEN/THEN specifications
 - **verifying-specs** - Completeness/correctness/coherence + debt identification
 - **archiving-specs** - Merge deltas into living specs
@@ -272,6 +278,7 @@ User: /superpowerwithcodex:claude-codex-specs-tdd
 - **using-git-worktrees** - Parallel development branches
 - **finishing-a-development-branch** - Merge/PR decision workflow (includes handover step)
 - **handover-manager** - Cross-session/cross-tool handover snapshots (with PreCompact hook)
+- **learn** - Lesson capture with confirmation gates, tag dedup, and pattern promotion
 - **subagent-driven-development** - Fast iteration with quality gates
 
 **External Tool Integration**
