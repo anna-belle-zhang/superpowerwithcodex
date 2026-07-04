@@ -69,6 +69,7 @@ Every restart instruction must be a concrete copy-pasteable command or file path
 5. Reference workflow ledgers by path rather than copying them.
 6. Write the handover document with the six required sections.
 7. Rewrite `docs/handovers/LATEST.md` to point at the new document with its topic and status.
+8. Invoke the learn skill's passive scan as the final wrap-up step. The learn scan runs after the handover is written, never modifies it, presents its candidate list or reports no candidates, and completes before the session is considered wrapped up.
 
 `docs/handovers/LATEST.md` is a small index containing the newest handover path, topic, and status. Rewrite it after every new handover.
 
@@ -100,6 +101,7 @@ If no handover exists, state that no handover was found and fall back to normal 
 - Never copy fine-grained ledger content into the handover; reference the file path.
 - Never use vague restart instructions when a command or file path can be given.
 - Never fabricate prior state when no handover exists.
+- Never let learn scan results modify the handover document; the handover and LATEST.md remain exactly as generated.
 
 ## Integration
 
@@ -111,3 +113,4 @@ If no handover exists, state that no handover was found and fall back to normal 
 **Pairs with:**
 - **spec-driven-tdd** via `docs/specs/<feature>/progress.md` references.
 - **brainstorming** via grill ledger references.
+- **learn** via the final passive scan during wrap-up.
