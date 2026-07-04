@@ -30,6 +30,20 @@ THEN docs/handovers/LATEST.md is rewritten to point at the new document with its
 
 *Added: 2026-07-03 via handover-manager*
 
+### Wrap-Up Invokes the Learn Scan
+GIVEN a handover has been generated and LATEST.md updated
+WHEN the wrap-up completes
+THEN the learn scan runs and presents its candidate list (or reports no candidates) before the session is considered wrapped up
+
+*Modified: 2026-07-04 via learn (was: handover generation ended after docs/handovers/LATEST.md was updated)*
+
+### Handover Content Unaffected by Scan Outcome
+GIVEN the learn scan produces candidates or errors after a handover is written
+WHEN the wrap-up finishes
+THEN the handover document and LATEST.md remain exactly as generated
+
+*Modified: 2026-07-04 via learn (was: implicit — scan step did not exist; the handover remains a verified snapshot the scan never edits)*
+
 ### Honest Progress Reporting
 GIVEN work in progress where tests fail or a task is half-done
 WHEN the verification results section is written
