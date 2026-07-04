@@ -8,8 +8,10 @@ set -euo pipefail
 RULES='MANDATORY WORKFLOW RULES (enforced every turn — not optional):
 
 1. SPECS BEFORE CODE: Never write implementation code without specs in docs/specs/<feature>/.
-   - Brainstorm first → write specs → dispatch Codex with spec path only
-   - If asked to "just implement", ask: "Specs first — run /superpowerwithcodex:brainstorm?"
+   - Start feature work with /superpowerwithcodex:sdd-router.
+   - Spec weight is tiered by the sdd-router: FULL = proposal/design/deltas, LIGHT = mini.md.
+   - Any risk hit forces FULL. No code is written without one of the two.
+   - If asked to "just implement", ask: "Specs first — run /superpowerwithcodex:sdd-router?"
 
 2. DISPATCH FORMAT (never deviate):
    Use superpowerwithcodex:spec-driven-tdd
@@ -22,7 +24,8 @@ RULES='MANDATORY WORKFLOW RULES (enforced every turn — not optional):
    Claude only writes E2E tests after Codex returns.
 
 4. SKILL COMMANDS TO USE:
-   - /superpowerwithcodex:brainstorm   → before any feature work
+   - /superpowerwithcodex:sdd-router   → before any feature work
+   - /superpowerwithcodex:brainstorm   → FULL path before writing specs
    - /superpowerwithcodex:write-specs  → after brainstorming
    - /superpowerwithcodex:verify-specs → after Codex returns
    - /superpowerwithcodex:archive-specs → after verify passes

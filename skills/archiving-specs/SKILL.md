@@ -32,13 +32,16 @@ Post-completion merge flow:
 
 ```bash
 # Feature specs
+test -f docs/specs/<feature>/mini.md && echo "LIGHT mini.md"
 ls docs/specs/<feature>/specs/*-delta.md
 
 # Living specs (create if first time)
 mkdir -p docs/specs/_living
 ```
 
-### Step 2: Process Each Delta Spec
+If `docs/specs/<feature>/mini.md` exists, archive it as a LIGHT feature. Otherwise process `*-delta.md` files as a FULL feature.
+
+### Step 2: Process Each Delta Spec Or Mini-Spec
 
 For each `<component>-delta.md`:
 
@@ -88,6 +91,21 @@ THEN [new expected result]
 - YYYY-MM-DD: Removed "<Behavior Name>" via <feature> (reason: [reason from delta])
 ```
 
+#### LIGHT Mini-Spec Entries
+
+For LIGHT features, merge mini.md scenarios into the appropriate `docs/specs/_living/<component>.md` as added behaviors with the same attribution used for ADDED deltas.
+
+```markdown
+### <Behavior Name>
+GIVEN ...
+WHEN ...
+THEN ...
+
+*Added: YYYY-MM-DD via <feature>*
+```
+
+If the component is not obvious from `mini.md`, infer it from the feature name and report that inference.
+
 ### Step 2.5: Update System Index
 
 After processing all delta specs, update `docs/specs/_living/ARCHITECTURE.md`:
@@ -105,7 +123,7 @@ After processing all delta specs, update `docs/specs/_living/ARCHITECTURE.md`:
 Before moving the feature directory, verify it is complete:
 
 1. **progress.md** — if the feature directory has no `progress.md`, STOP and ask whether to backfill a stub or proceed with a noted gap
-2. **proposal.md / design.md** — if either is missing, issue a warning and continue (not blocking)
+2. **proposal.md / design.md** — for FULL features, if either is missing, issue a warning and continue (not blocking). For LIGHT features with `mini.md`, missing proposal.md / design.md is expected and should not warn.
 3. **Stray spec files** — if any `*.md` file sits at the feature root instead of inside `specs/`, move it into `specs/` before archiving
 4. **Junk files** — if the feature directory contains junk files (`* copy.*` or editor backups), delete them before archiving
 

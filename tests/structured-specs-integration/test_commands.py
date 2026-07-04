@@ -8,6 +8,7 @@ from conftest import COMMANDS_DIR, _extract_frontmatter, _read_command
 
 
 COMMANDS = {
+    "sdd-router": "sdd-router",
     "write-specs": "writing-specs",
     "verify-specs": "verifying-specs",
     "archive-specs": "archiving-specs",
@@ -15,7 +16,7 @@ COMMANDS = {
 
 
 class TestCommandFileExistence:
-    """All three new command files must exist."""
+    """All command files must exist."""
 
     @pytest.mark.parametrize("command_name", COMMANDS.keys())
     def test_command_file_exists(self, command_name):

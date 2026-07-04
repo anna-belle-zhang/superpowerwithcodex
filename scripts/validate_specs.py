@@ -5,6 +5,8 @@ from pathlib import Path
 
 
 CHANGE_SECTIONS = {"ADDED", "MODIFIED", "REMOVED"}
+MINI_SPEC_MIN_SCENARIOS = 2
+MINI_SPEC_MAX_SCENARIOS = 5
 
 
 def usage():
@@ -52,6 +54,23 @@ def count_scenarios(body):
     return count
 
 
+def frontmatter_fields(markdown):
+    fields = {}
+    if not markdown.startswith("---\n"):
+        return fields
+
+    end = markdown.find("\n---", 4)
+    if end == -1:
+        return fields
+
+    for line in markdown[4:end].splitlines():
+        match = re.match(r"^(\w[\w-]*):\s*(.*)$", line.strip())
+        if match:
+            key, value = match.groups()
+            fields[key] = value.strip()
+    return fields
+
+
 def metadata_fields(body):
     fields = set()
     for field in ("Was", "Now", "Reason"):
@@ -96,7 +115,53 @@ def parse_delta(text):
     return present_sections, sections
 
 
-def validate_feature_dir(feature_dir):
+def validate_mini_spec(feature_dir, mini, delta_files):
+    errors = []
+
+    if delta_files:
+        errors.append(
+            (
+                relative(feature_dir),
+                "feature must be either LIGHT (mini.md) or FULL (proposal/design/deltas), not both",
+            )
+        )
+        return errors, 0
+
+    text = read_text(mini, errors)
+    if text is None:
+        return errors, 0
+
+    frontmatter = frontmatter_fields(text)
+    if frontmatter.get("mode") != "light":
+        errors.append(
+            (
+                relative(mini),
+                "missing/invalid frontmatter field: mode: light",
+            )
+        )
+
+    scenarios = section_body(text, "Scenarios")
+    scenario_count = count_scenarios(scenarios or "")
+    if not (MINI_SPEC_MIN_SCENARIOS <= scenario_count <= MINI_SPEC_MAX_SCENARIOS):
+        errors.append(
+            (
+                relative(mini),
+                f"scenario count {scenario_count}; allowed range is 2-5",
+            )
+        )
+
+    intent_match = re.search(r"^Intent:\s+\S.+$", text, re.MULTILINE)
+    if not intent_match:
+        errors.append((relative(mini), "Intent must be one sentence"))
+
+    out_of_scope = section_body(text, "Out of Scope")
+    if out_of_scope is None or not out_of_scope.strip():
+        errors.append((relative(mini), "Out of Scope section is empty"))
+
+    return errors, scenario_count
+
+
+def validate_full_spec(feature_dir, delta_files):
     errors = []
     scenario_count = 0
     modified_behaviors = {}
@@ -121,9 +186,8 @@ def validate_feature_dir(feature_dir):
         if design_text is not None and not design_text.strip():
             errors.append((relative(design), "design.md is empty"))
 
-    specs_dir = feature_dir / "specs"
-    delta_files = sorted(specs_dir.glob("*-delta.md")) if specs_dir.is_dir() else []
     if not delta_files:
+        specs_dir = feature_dir / "specs"
         errors.append((relative(specs_dir), "no delta specs were found"))
 
     for delta_file in delta_files:
@@ -200,6 +264,19 @@ def validate_feature_dir(feature_dir):
     return errors, len(delta_files), scenario_count
 
 
+def validate_feature_dir(feature_dir):
+    specs_dir = feature_dir / "specs"
+    delta_files = sorted(specs_dir.glob("*-delta.md")) if specs_dir.is_dir() else []
+    mini = feature_dir / "mini.md"
+
+    if mini.exists():
+        errors, scenario_count = validate_mini_spec(feature_dir, mini, delta_files)
+        return errors, 0, scenario_count, "mini"
+
+    errors, delta_count, scenario_count = validate_full_spec(feature_dir, delta_files)
+    return errors, delta_count, scenario_count, "full"
+
+
 def main(argv):
     if len(argv) != 2:
         usage()
@@ -214,13 +291,16 @@ def main(argv):
         usage()
         return 2
 
-    errors, delta_count, scenario_count = validate_feature_dir(feature_dir)
+    errors, delta_count, scenario_count, mode = validate_feature_dir(feature_dir)
     if errors:
         for path, message in errors:
             print(f"ERROR {path}: {message}")
         return 1
 
-    print(f"OK: {delta_count} delta spec(s), {scenario_count} scenario(s)")
+    if mode == "mini":
+        print(f"OK: mini spec, {scenario_count} scenario(s)")
+    else:
+        print(f"OK: {delta_count} delta spec(s), {scenario_count} scenario(s)")
     return 0
 
 

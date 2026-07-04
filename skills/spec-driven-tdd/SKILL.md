@@ -28,15 +28,31 @@ If the dispatch prompt does not specify a test command, auto-detect:
 
 ### Step 1: Read All Specs
 
+If `docs/specs/<feature>/mini.md` exists, this is a LIGHT feature:
+
+```bash
+cat docs/specs/<feature>/mini.md
+```
+
+Otherwise this is a FULL feature:
+
 ```bash
 cat docs/specs/<feature>/specs/*-delta.md
 ```
 
-Extract every GIVEN/WHEN/THEN. Each one is a contractual requirement — not a suggestion, not a guideline. If the spec says `{ error: "Unauthorized" }`, your test asserts exactly `{ error: "Unauthorized" }`.
+Extract every GIVEN/WHEN/THEN. Each one is a contractual requirement — not a suggestion, not a guideline. A mini.md scenario is the same contract as a delta scenario, and no scenario is treated as optional because the spec is "light". If the spec says `{ error: "Unauthorized" }`, your test asserts exactly `{ error: "Unauthorized" }`.
 
 ### Step 2: Write Plan → save to `progress.md`
 
-Group scenarios into tasks. Record the spec fingerprint — the hashes of every spec file your plan is derived from:
+Group scenarios into tasks. Record the spec fingerprint — the hashes of exactly the spec files your plan is derived from.
+
+For LIGHT features, fingerprint `mini.md` alone:
+
+```bash
+cd docs/specs/<feature>/ && sha256sum mini.md
+```
+
+For FULL features, fingerprint the full file set:
 
 ```bash
 cd docs/specs/<feature>/ && sha256sum proposal.md design.md specs/*-delta.md
@@ -77,7 +93,9 @@ For each task:
 
 If `docs/specs/<feature>/progress.md` already exists:
 
-1. **Verify the spec fingerprint FIRST** — before trusting any `[x]`:
+1. **Verify the spec fingerprint FIRST** — before trusting any `[x]`. Recompute the mode-appropriate file set:
+   - LIGHT mode: `sha256sum mini.md`
+   - FULL mode: `sha256sum proposal.md design.md specs/*-delta.md`
    ```bash
    cd docs/specs/<feature>/ && sha256sum proposal.md design.md specs/*-delta.md
    ```

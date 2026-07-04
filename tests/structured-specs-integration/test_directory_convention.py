@@ -90,6 +90,43 @@ class TestDirectoryStructureSetup:
             f.write("# Greeter Delta Spec\n\n## ADDED\n\n### Hello\nGIVEN name\nWHEN greet\nTHEN hello\n")
         assert os.path.isfile(delta_path)
 
+    def test_light_feature_can_use_mini_spec_without_full_layout(self, tmp_path):
+        """LIGHT feature directories may omit proposal/design/specs."""
+        feature_dir = tmp_path / "docs" / "specs" / "light-feature"
+        feature_dir.mkdir(parents=True)
+        mini_path = feature_dir / "mini.md"
+        mini_path.write_text(
+            """---
+mode: light
+---
+
+# Light Feature - Mini Spec
+
+Intent: Validate the LIGHT directory carve-out.
+
+## Scenarios
+
+### One
+GIVEN a LIGHT feature directory
+WHEN it contains mini.md
+THEN proposal.md is not required
+
+### Two
+GIVEN a LIGHT feature directory
+WHEN it contains mini.md
+THEN design.md and specs/ are not required
+
+## Out of Scope
+- Full layout
+""",
+            encoding="utf-8",
+        )
+
+        assert os.path.isfile(mini_path)
+        assert not os.path.exists(feature_dir / "proposal.md")
+        assert not os.path.exists(feature_dir / "design.md")
+        assert not os.path.exists(feature_dir / "specs")
+
     def test_can_create_living_spec(self, tmp_specs_dir):
         living_path = os.path.join(tmp_specs_dir["living"], "greeter.md")
         with open(living_path, "w") as f:

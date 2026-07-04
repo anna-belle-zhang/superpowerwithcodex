@@ -37,13 +37,16 @@ Structural defects (missing sections, incomplete GIVEN/WHEN/THEN, missing Was/No
 ### Step 1: Locate Specs
 
 - Find the feature specs directory: `docs/specs/<feature>/`
-- Read all `*-delta.md` files in `docs/specs/<feature>/specs/`
+- If `docs/specs/<feature>/mini.md` exists, read scenarios from `mini.md`
+- Otherwise, read all `*-delta.md` files in `docs/specs/<feature>/specs/`
 - If no specs directory exists: "No structured specs found. Skipping verification."
 - Extract every GIVEN/WHEN/THEN scenario into a checklist.
 
 ### Step 2: Completeness Check
 
-For each scenario in the delta specs:
+Produce the same scenario→test coverage table for LIGHT `mini.md` scenarios and FULL delta scenarios.
+
+For each scenario in `mini.md` or the delta specs:
 
 1. Search the test files for a test that covers this scenario
 2. Match by behavior, not by name (a test named differently but covering the scenario counts)
@@ -57,6 +60,7 @@ For each scenario in the delta specs:
 | Scenario | Source | Status | Test |
 |----------|--------|--------|------|
 | GIVEN x WHEN y THEN z | auth-delta.md | COVERED | test_login_success |
+| GIVEN light WHEN routed THEN tested | mini.md | COVERED | test_light_route |
 | GIVEN a WHEN b THEN c | auth-delta.md | MISSING | - |
 
 **Coverage: N/M scenarios covered (X%)**
@@ -94,6 +98,7 @@ Check for contradictions:
 1. **Between deltas:** No two delta specs define contradictory behavior for the same component
 2. **Against living specs:** MODIFIED entries in deltas correctly reference what exists in `docs/specs/_living/`
 3. **REMOVED entries:** Items marked REMOVED actually exist in living specs
+4. **Mini-spec coherence:** `mini.md` scenarios must not contradict behaviors in `docs/specs/_living/`
 
 **Output format:**
 
@@ -101,6 +106,7 @@ Check for contradictions:
 ## Coherence Report
 
 - No contradictions between delta specs: OK/FAIL
+- No contradictions between mini.md and living specs: OK/FAIL/N/A (no mini.md)
 - Delta MODIFIED entries match living specs: OK/FAIL/N/A (no living specs)
 - Delta REMOVED entries exist in living specs: OK/FAIL/N/A (no removals)
 
